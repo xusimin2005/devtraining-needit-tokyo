@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_event">
+    <sys_ux_event action="INSERT_OR_UPDATE">
+        <description/>
+        <event_name>MY_TASKS_REJECT</event_name>
+        <interfaces/>
+        <label>My tasks reject</label>
+        <props>[{"name":"sysId","fieldType":"string","label":"Sys ID","interfaceApiName":"","typeMetadata":null,"mandatory":false,"readOnly":false},{"name":"table","fieldType":"string","label":"Table","interfaceApiName":"","typeMetadata":null,"mandatory":false,"readOnly":false}]</props>
+        <required_translations/>
+        <schema_version>1.0.0</schema_version>
+        <sys_class_name>sys_ux_event</sys_class_name>
+        <sys_created_by>system</sys_created_by>
+        <sys_created_on>2024-03-04 03:17:37</sys_created_on>
+        <sys_id>8df5a4a433b84210faab2f9008f6938b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>My tasks reject</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ux_event_8df5a4a433b84210faab2f9008f6938b</sys_update_name>
+        <sys_updated_by>system</sys_updated_by>
+        <sys_updated_on>2024-03-04 03:17:37</sys_updated_on>
+    </sys_ux_event>
+    <sys_translated_text action="delete_multiple" query="documentkey=8df5a4a433b84210faab2f9008f6938b"/>
+</record_update>

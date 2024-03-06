@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_composite_data_template_predicate">
+    <sys_ux_composite_data_template_predicate action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition table="task">active=true^EQ<item endquery="false" field="active" goto="false" newquery="false" operator="=" or="false" value="true"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </condition>
+        <custom_condition/>
+        <custom_field_list/>
+        <field_list>number,priority,state,assigned_to.name,assignment_group.name,sys_created_on,description</field_list>
+        <name>Custom Portal Landing - My Tasks Predicate</name>
+        <order/>
+        <predicate_bundle/>
+        <required_roles/>
+        <sys_class_name>sys_ux_composite_data_template_predicate</sys_class_name>
+        <sys_created_by>system</sys_created_by>
+        <sys_created_on>2024-03-04 03:17:36</sys_created_on>
+        <sys_id>01f5a4a4e4b84210fa0663c263c9a384</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Custom Portal Landing - My Tasks Predicate</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ux_composite_data_template_predicate_01f5a4a4e4b84210fa0663c263c9a384</sys_update_name>
+        <sys_updated_by>system</sys_updated_by>
+        <sys_updated_on>2024-03-04 03:17:36</sys_updated_on>
+        <table>task</table>
+        <ux_template display_value="Custom Portal Landing - My Tasks template">c1f5a4a425b842108735454b9dcb7084</ux_template>
+    </sys_ux_composite_data_template_predicate>
+</record_update>
