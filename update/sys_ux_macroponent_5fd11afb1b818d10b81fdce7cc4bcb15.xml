@@ -3564,23 +3564,10 @@
               "value" : false
             },
             "sections" : {
-              "type" : "JSON_LITERAL",
-              "value" : [ {
-                "sysId" : "bf1d96e3c0a801640190725e63f8ac80",
-                "caption" : "example",
-                "captionDisplay" : "Example Section",
-                "rows" : [ [ {
-                  "fields" : [ "number", "caller_id", "category", "subcategory", "business_service", "service_offering", "cmdb_ci", "universal_request", "route_reason" ]
-                }, {
-                  "fields" : [ "contact_type", "state", "hold_reason", "impact", "urgency", "priority", "assignment_group", "assigned_to" ]
-                } ], [ {
-                  "fields" : [ "short_description", "description" ]
-                } ] ],
-                "id" : 0,
-                "label" : "Example Section",
-                "defaultSection" : false,
-                "expanded" : true
-              } ]
+              "type" : "DATA_OUTPUT_BINDING",
+              "binding" : {
+                "address" : [ "next_needit_form", "nowRecordFormBlob", "sections" ]
+              }
             },
             "inUiBuilder" : {
               "type" : "JSON_LITERAL",
@@ -3618,271 +3605,9 @@
               "value" : false
             },
             "fields" : {
-              "type" : "JSON_LITERAL",
-              "value" : {
-                "number" : {
-                  "name" : "number",
-                  "dictionary" : {
-                    "type" : "string",
-                    "dependentFieldLabel" : null,
-                    "dependentField" : null,
-                    "dependentTable" : null,
-                    "name" : "number",
-                    "label" : "Number",
-                    "fieldHint" : "",
-                    "canWrite" : true,
-                    "canRead" : true,
-                    "canCreate" : true,
-                    "internalType" : "string",
-                    "isMandatory" : false,
-                    "isEncrypted" : false,
-                    "encryptionContext" : "",
-                    "sys_readonly" : false,
-                    "attributes" : [ {
-                      "name" : "edge_encryption_enabled",
-                      "value" : "true"
-                    }, {
-                      "name" : "ignore_filter_on_new",
-                      "value" : "true"
-                    }, {
-                      "name" : "ts_weight",
-                      "value" : "50"
-                    } ]
-                  },
-                  "maxLength" : 40,
-                  "defaultRows" : null,
-                  "type" : "string",
-                  "label" : "Number",
-                  "visible" : true,
-                  "readonly" : false,
-                  "mandatory" : false,
-                  "dependentField" : null,
-                  "dependentTable" : null,
-                  "referringTable" : "incident",
-                  "referringRecordId" : "2bf7f3b4c7132010840c625788c260c9",
-                  "internalType" : "string",
-                  "value" : "EXAMPLE007",
-                  "displayValue" : "EXAMPLE007",
-                  "valuesList" : [ ],
-                  "display_value_list" : [ ],
-                  "isEncrypted" : false,
-                  "encryptionContext" : "",
-                  "sys_readonly" : false,
-                  "originalValue" : "INC0010059"
-                },
-                "caller_id" : {
-                  "name" : "caller_id",
-                  "dictionary" : {
-                    "type" : "reference",
-                    "dependentFieldLabel" : "Company",
-                    "dependentField" : "company",
-                    "dependentTable" : "core_company",
-                    "name" : "caller_id",
-                    "label" : "Caller",
-                    "fieldHint" : "Personwhoreportedorisaffectedbythisincident",
-                    "canWrite" : true,
-                    "canRead" : true,
-                    "canCreate" : true,
-                    "internalType" : "reference",
-                    "isMandatory" : false,
-                    "isEncrypted" : false,
-                    "encryptionContext" : "",
-                    "sys_readonly" : false,
-                    "attributes" : [ {
-                      "name" : "encode_utf8",
-                      "value" : "false"
-                    }, {
-                      "name" : "ref_contributions",
-                      "value" : "user_show_incidents"
-                    } ]
-                  },
-                  "reference" : "sys_user",
-                  "referenceQualifier" : null,
-                  "referenceKey" : null,
-                  "useReferenceQualifier" : "simple",
-                  "dependent" : "company",
-                  "dependentOnField" : "company",
-                  "refAutoCompleter" : null,
-                  "refAcOrderBy" : null,
-                  "refAcColumns" : null,
-                  "refAcColumnsSearch" : false,
-                  "refAcDisplayValue" : false,
-                  "refQualElements" : null,
-                  "refContributions" : "user_show_incidents",
-                  "isDynamicCreate" : false,
-                  "isReferenceScriptableTable" : false,
-                  "referenceError" : null,
-                  "type" : "reference",
-                  "label" : "Caller",
-                  "visible" : true,
-                  "readonly" : false,
-                  "mandatory" : true,
-                  "dependentField" : "company",
-                  "dependentTable" : "core_company",
-                  "referringTable" : "incident",
-                  "referringRecordId" : "2bf7f3b4c7132010840c625788c260c9",
-                  "internalType" : "reference",
-                  "value" : "",
-                  "displayValue" : null,
-                  "valuesList" : [ ],
-                  "display_value_list" : [ ],
-                  "messages" : [ ],
-                  "sys_readonly" : false,
-                  "declarativeUiActions" : [ {
-                    "name" : "open_record",
-                    "icon" : "circle-info-outline",
-                    "label" : "Open Record",
-                    "dependency" : "",
-                    "requiresValue" : true,
-                    "order" : 0,
-                    "conditions" : "",
-                    "actionType" : "uxf_client_action",
-                    "actionComponent" : "",
-                    "actionDispatch" : "REFERENCE_INFO_CLICK",
-                    "actionPayload" : "",
-                    "actionAttributes" : "",
-                    "groupBy" : false,
-                    "group" : "",
-                    "assignmentId" : "172e2043534310108135ddeeff7b12dd",
-                    "confirmationRequired" : false,
-                    "confirmationMessage" : "",
-                    "tooltip" : "Open Record",
-                    "modelConditions" : [ {
-                      "field" : "value",
-                      "operator" : "ISNOTEMPTY",
-                      "value" : "",
-                      "newQuery" : false,
-                      "or" : false
-                    }, {
-                      "field" : null,
-                      "operator" : "=",
-                      "value" : null,
-                      "newQuery" : false,
-                      "or" : false
-                    } ],
-                    "payloadMap" : [ {
-                      "name" : "referenceInfoClick@referencetable",
-                      "value" : "{{referenceTable}}"
-                    }, {
-                      "name" : "referenceInfoClick@sys_id",
-                      "value" : "{{value}}"
-                    }, {
-                      "name" : "referenceInfoClick@field",
-                      "value" : "{{fieldName}}"
-                    }, {
-                      "name" : "referenceInfoClick@table",
-                      "value" : "{{tableName}}"
-                    }, {
-                      "name" : "referenceInfoClick@name",
-                      "value" : "{{name}}"
-                    } ]
-                  }, {
-                    "name" : "ref_search",
-                    "icon" : "magnifying-glass-outline",
-                    "label" : "Search For Record",
-                    "dependency" : "",
-                    "requiresValue" : false,
-                    "order" : 0,
-                    "conditions" : "",
-                    "actionType" : "uxf_client_action",
-                    "actionComponent" : "",
-                    "actionDispatch" : "REF_SEARCH_REQUESTED",
-                    "actionPayload" : "",
-                    "actionAttributes" : "",
-                    "groupBy" : false,
-                    "group" : "",
-                    "assignmentId" : "c6542741ff13101035be517f793bf1bb",
-                    "confirmationRequired" : false,
-                    "confirmationMessage" : "",
-                    "tooltip" : "Search for record",
-                    "modelConditions" : [ {
-                      "field" : "readonly",
-                      "operator" : "=",
-                      "value" : "false",
-                      "newQuery" : false,
-                      "or" : false
-                    }, {
-                      "field" : null,
-                      "operator" : "=",
-                      "value" : null,
-                      "newQuery" : false,
-                      "or" : false
-                    } ],
-                    "payloadMap" : [ {
-                      "name" : "parentSysId",
-                      "value" : "{{recordSysId}}"
-                    }, {
-                      "name" : "encodedRecord",
-                      "value" : "{{encodedRecord}}"
-                    }, {
-                      "name" : "referenceField",
-                      "value" : "{{fieldName}}"
-                    }, {
-                      "name" : "fieldLabel",
-                      "value" : "{{label}}"
-                    }, {
-                      "name" : "serializedChanges",
-                      "value" : "{{serializedChanges}}"
-                    }, {
-                      "name" : "parentTable",
-                      "value" : "{{tableName}}"
-                    } ]
-                  } ],
-                  "originalValue" : ""
-                },
-                "short_description" : {
-                  "name" : "short_description",
-                  "dictionary" : {
-                    "type" : "string",
-                    "dependentFieldLabel" : null,
-                    "dependentField" : null,
-                    "dependentTable" : null,
-                    "name" : "short_description",
-                    "label" : "Short Description",
-                    "fieldHint" : "",
-                    "canWrite" : true,
-                    "canRead" : true,
-                    "canCreate" : true,
-                    "internalType" : "string",
-                    "isMandatory" : false,
-                    "isEncrypted" : false,
-                    "encryptionContext" : "",
-                    "sys_readonly" : false,
-                    "attributes" : [ {
-                      "name" : "edge_encryption_enabled",
-                      "value" : "true"
-                    }, {
-                      "name" : "knowledge_search",
-                      "value" : "true"
-                    }, {
-                      "name" : "no_truncate",
-                      "value" : "true"
-                    }, {
-                      "name" : "ts_weight",
-                      "value" : "10"
-                    } ]
-                  },
-                  "maxLength" : 160,
-                  "defaultRows" : null,
-                  "type" : "string",
-                  "label" : "Short Description",
-                  "visible" : true,
-                  "readonly" : false,
-                  "mandatory" : true,
-                  "dependentField" : null,
-                  "dependentTable" : null,
-                  "referringTable" : "incident",
-                  "referringRecordId" : "2bf7f3b4c7132010840c625788c260c9",
-                  "internalType" : "string",
-                  "value" : "",
-                  "displayValue" : null,
-                  "valuesList" : [ ],
-                  "display_value_list" : [ ],
-                  "isEncrypted" : false,
-                  "encryptionContext" : "",
-                  "sys_readonly" : false,
-                  "originalValue" : ""
-                }
+              "type" : "DATA_OUTPUT_BINDING",
+              "binding" : {
+                "address" : [ "next_needit_form", "nowRecordFormBlob", "formFieldValues" ]
               }
             },
             "config" : {
@@ -4067,7 +3792,7 @@
     },
     "view" : {
       "type" : "JSON_LITERAL",
-      "value" : "default view"
+      "value" : "ess"
     },
     "forcedViewName" : {
       "type" : "JSON_LITERAL",
@@ -4174,9 +3899,6 @@
   "message" : "All",
   "comment" : ""
 }, {
-  "message" : "Caller",
-  "comment" : ""
-}, {
   "message" : "Closed NeedIts",
   "comment" : ""
 }, {
@@ -4184,9 +3906,6 @@
   "comment" : ""
 }, {
   "message" : "Enter a label",
-  "comment" : ""
-}, {
-  "message" : "Example Section",
   "comment" : ""
 }, {
   "message" : "Facilities",
@@ -4216,12 +3935,6 @@
   "message" : "Next NeedIt Details",
   "comment" : ""
 }, {
-  "message" : "Number",
-  "comment" : ""
-}, {
-  "message" : "Open Record",
-  "comment" : ""
-}, {
   "message" : "Overdue NeedIts",
   "comment" : ""
 }, {
@@ -4229,12 +3942,6 @@
   "comment" : ""
 }, {
   "message" : "Request type to view:",
-  "comment" : ""
-}, {
-  "message" : "Search For Record",
-  "comment" : ""
-}, {
-  "message" : "Short Description",
   "comment" : ""
 }, {
   "message" : "The NeedIt Experience",
@@ -4297,14 +4004,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2022-01-21 15:00:21</sys_created_on>
         <sys_id>5fd11afb1b818d10b81fdce7cc4bcb15</sys_id>
-        <sys_mod_count>71</sys_mod_count>
+        <sys_mod_count>81</sys_mod_count>
         <sys_name>Home</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ux_macroponent_5fd11afb1b818d10b81fdce7cc4bcb15</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-03-08 07:51:06</sys_updated_on>
+        <sys_updated_on>2024-03-09 03:32:36</sys_updated_on>
     </sys_ux_macroponent>
     <sys_translated_text action="delete_multiple" query="documentkey=5fd11afb1b818d10b81fdce7cc4bcb15"/>
 </record_update>
