@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="216b30cc97054250ed8db857f053af29" label="Employee" max_length="40" name="x_58872_needit_employee" type="collection">
+        <element label="Dept cd" max_length="32" name="dept_cd" reference="x_58872_needit_dept" type="reference"/>
+        <element label="Dept name" max_length="40" name="dept_name" read_only="true" type="string"/>
+        <element label="Name" max_length="20" name="name" type="string"/>
+        <element attributes="ignore_filter_on_new=true" default="javascript:global.getNextObjNumberPadded();" label="Number" max_length="40" name="number" type="string"/>
+        <index name="index">
+            <element name="dept_cd"/>
+        </index>
+    </element>
+</database>

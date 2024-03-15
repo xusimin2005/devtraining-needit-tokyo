@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="7a94fc4497054250ed8db857f053aff5" label="Dept" max_length="40" name="x_58872_needit_dept" type="collection">
+        <element display="true" label="Dept cd" mandatory="true" max_length="20" name="dept_cd" type="string"/>
+        <element label="Dept name" max_length="40" name="dept_name" type="string"/>
+    </element>
+</database>

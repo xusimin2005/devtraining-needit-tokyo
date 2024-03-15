@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script_client">
+    <sys_script_client action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <applies_extended>false</applies_extended>
+        <condition/>
+        <description/>
+        <field>dept_cd</field>
+        <global>true</global>
+        <isolate_script>true</isolate_script>
+        <messages/>
+        <name>Populate Dept name Field</name>
+        <order/>
+        <script><![CDATA[function onChange(control, oldValue, newValue, isLoading, isTemplate) {
+   if (isLoading || newValue === '') {
+      return;
+   }
+
+   //Type appropriate comment here, and begin script below
+   // Instantiate the GetEmailAddress Script Include 
+    var getDeptName = new GlideAjax('GetDeptName');
+    // Specify the getEmail method
+    getDeptName.addParam('sysparm_name','getDeptInfo');
+    // Pass the Requested for sys_id
+    getDeptName.addParam('sysparm_deptcd', g_form.getValue('dept_cd'));
+    // Send the request to the server
+    getDeptName.getXML(populateDeptNameField);
+
+
+    // When the response is back from the server
+    function populateDeptNameField(response){
+        // Extract the email address from the response, clear any value from the email field, 
+        // set new value in the email field
+        var deptNameFromScriptInclude = response.responseXML.documentElement.getAttribute("answer");
+        g_form.clearValue('dept_name');
+        g_form.setValue('dept_name',deptNameFromScriptInclude);
+    }
+}]]></script>
+        <sys_class_name>sys_script_client</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-03-15 03:29:06</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>4fd0150c97854250ed8db857f053af5c</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Populate Dept name Field</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_client_4fd0150c97854250ed8db857f053af5c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-03-15 03:33:19</sys_updated_on>
+        <table>x_58872_needit_employee</table>
+        <type>onChange</type>
+        <ui_type>0</ui_type>
+        <view/>
+    </sys_script_client>
+</record_update>
