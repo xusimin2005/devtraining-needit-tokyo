@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="3e0c727493070210868ab4de3bba1032" extends="sys_import_set_row" label="C0 Temp" max_length="40" name="x_58872_needit_c0_temp" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Date" label="Date" max_length="40" name="u_date" type="glide_date"/>
+    </element>
+</database>
