@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_58872_needit.Utility</name>
+        <script><![CDATA[var x_58872_needit = x_58872_needit || {};
+
+x_58872_needit.Utility = (function() {
+	"use strict";
+
+/* set your private variables and functions here. For example: 
+	var privateVar = 0; 
+	function private_function() {
+		return ++privateVar;
+	}
+*/
+
+/* Share variables between multiple UI scripts by adding them to your scope object. For example: 
+	x_58872_needit.sharedVar = 0; 
+
+ Then access them in your scripts the same way. For example: 
+	function get_shared() {
+		return x_58872_needit.sharedVar;
+	}
+*/
+
+	return {
+
+/* set your public API here. For example:
+		incrementAndReturnPrivateVar: function() {
+			return private_function();
+		},
+*/
+		transformString: function(obj) {
+			var objType = typeof obj;
+			if (obj === null || obj === "" || objType === "undefined") {
+				return "";
+			} else if (objType === "string") {
+				return obj;
+			} else if (objType === "object") {
+				if ("richText" in obj) {
+					var richText = obj.richText;
+					var buff = "";
+					for (var i = 0; i < richText.length; i++) {
+						buff = buff + richText[i]["text"];
+					}
+					return buff;
+				} else {
+					return this.dateToString(obj);
+				}
+			} else {
+				return obj.toString();
+			}
+		},
+
+		dateToString: function(obj) {
+			if (obj) {
+				if (typeof obj == "string") {
+					return obj;
+				} else {
+					try {
+						var Y = obj.getFullYear();
+						var M = obj.getMonth() + 1;
+						var D = obj.getDate();
+						return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
+					} catch(ex) {
+						return obj.toString();
+					}
+				}
+			} else {
+				return '';
+			}
+		},
+
+		transformNumber: function(obj) {
+			if (obj == null || obj == "" || typeof obj == "undefined") {
+				return null;
+			} else {
+				return Number(obj);
+			}
+		},
+
+		transformInt: function(obj) {
+			if (obj == null || obj == "" || typeof obj == "undefined") {
+				return null;
+			} else {
+				return parseInt(obj);
+			}
+		},
+
+		transformFloat: function(obj) {
+			if (obj == null || obj == "" || typeof obj == "undefined") {
+				return null;
+			} else {
+				return parseFloat(obj);
+			}
+		},
+		
+		typeTransform: function(obj, item, type) {
+			var itemValue = obj[item];
+			if (type == "int") {
+				obj[item] = this.transformInt(itemValue);
+			} else if (type == "float") {
+				obj[item] = this.transformFloat(itemValue);
+			} else if (type == "number") {
+				obj[item] = this.transformNumber(itemValue);
+			} else {
+				obj[item] = this.transformString(itemValue);
+			}
+		},
+		
+		type:  "Utility"
+	};
+})();
+]]></script>
+        <script_name>Utility</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-27 07:43:27</sys_created_on>
+        <sys_id>3abd21e193c74210868ab4de3bba10c7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_58872_needit.Utility</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_script_3abd21e193c74210868ab4de3bba10c7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-27 07:43:27</sys_updated_on>
+        <ui_type>10</ui_type>
+        <use_scoped_format>true</use_scoped_format>
+    </sys_ui_script>
+</record_update>
