@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="fddf88dd9335c210868ab4de3bba10af" label="B0" max_length="40" name="x_58872_needit_b0" type="collection">
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Year" mandatory="true" max_length="40" name="year" type="integer"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Active" max_length="40" name="active" type="boolean"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Company" mandatory="true" max_length="40" name="company" type="string"/>
+        <element label="V6" max_length="40" name="v6" type="integer"/>
+        <element label="V3" max_length="40" name="v3" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Item" mandatory="true" max_length="40" name="item" type="string"/>
+        <element label="V5" max_length="40" name="v5" type="integer"/>
+        <element label="V4" max_length="40" name="v4" type="integer"/>
+    </element>
+</database>

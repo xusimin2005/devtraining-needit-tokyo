@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.AttachmentId</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AttachmentId</name>
+        <script><![CDATA[var AttachmentId = Class.create();
+AttachmentId.prototype = {
+    initialize: function(tableName) {
+		this.attachment_table = "sys_attachment";
+		this.tableName = tableName; //指定附件所存放的表
+		this.id = ""; //附件的sys_id
+		this.message = "";
+    },
+
+	//根据附件所在记录的sys_id获取附件的sys_id
+	getByRecordId: function(recordId) {
+		var ret = false;
+
+		var gr = new GlideRecord(this.attachment_table);
+		try {
+			//设定模板配置表的表名条件
+			gr.addQuery('table_sys_id', recordId);
+			gr.addQuery('table_name', 'ENDSWITH', this.tableName);
+			gr.orderByDesc('sys_updated_on');
+			gr.setLimit(1);
+			gr.query();
+			if (gr.next()) {
+				this.id = gr.getValue("sys_id");
+				ret = true;
+			} else {
+				this.id = "";
+				this.message = "不能获取附件对象" +
+					", tableName=" + this.tableName +
+					", recordId=" + recordId;
+				gs.error(this.message);
+			}
+		} catch(ex) {
+			this.id = "";
+			this.message = "获取AttachmentId时异常: " + ex.message;
+			gs.error(this.message);
+		} finally {
+			//释放内存
+			gr = null;
+		}
+		return ret;
+	},
+
+	//根据附件的文件名获取附件的sys_id
+	getByFilename: function(fileName) {
+		var ret = false;
+
+		var gr = new GlideRecord(this.attachment_table);
+		try {
+			//设定模板配置表的表名条件
+			gr.addQuery('file_name', fileName);
+			gr.addQuery('table_name', 'ENDSWITH', this.tableName);
+			gr.orderByDesc('sys_updated_on');
+			gr.setLimit(1);
+			gr.query();
+			if (gr.next()) {
+				this.id = gr.getValue("sys_id");
+				ret = true;
+			} else {
+				this.id = "";
+				this.message = "不能获取附件对象" +
+					", tableName=" + this.tableName +
+					", fileName=" + fileName;
+				gs.error(this.message);
+			}
+		} catch(ex) {
+			this.id = "";
+			this.message = "获取附件对象时异常: " + ex.message;
+			gs.error(this.message);
+		} finally {
+			//释放内存
+			gr = null;
+		}
+		return ret;
+	},
+
+    type: 'AttachmentId'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-14 03:57:25</sys_created_on>
+        <sys_id>50ef79d993b20210868ab4de3bba1022</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>AttachmentId</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_50ef79d993b20210868ab4de3bba1022</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-17 08:33:37</sys_updated_on>
+    </sys_script_include>
+</record_update>

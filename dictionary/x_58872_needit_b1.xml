@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="489120dd93b5c210868ab4de3bba1083" label="B1" max_length="40" name="x_58872_needit_b1" type="collection">
+        <element label="Ref Item" max_length="32" name="ref_item" reference="x_58872_needit_t0" type="reference"/>
+        <element label="Val1" max_length="40" name="val1" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Month" max_length="40" name="month" type="glide_date"/>
+        <element attributes="edge_encryption_enabled=true" label="Item" max_length="40" name="item" type="string"/>
+        <index name="index">
+            <element name="ref_item"/>
+        </index>
+    </element>
+</database>

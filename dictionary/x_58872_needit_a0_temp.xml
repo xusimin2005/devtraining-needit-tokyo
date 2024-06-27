@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="315c9c0993b18210868ab4de3bba10d4" extends="sys_import_set_row" label="A0 Temp" max_length="40" name="x_58872_needit_a0_temp" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=M5" label="M5" max_length="40" name="u_m5" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=M3" label="M3" max_length="40" name="u_m3" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=M6" label="M6" max_length="40" name="u_m6" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Ver" max_length="40" name="u_ver" type="string"/>
+        <element attributes="import_attribute_name=M4" label="M4" max_length="40" name="u_m4" type="integer"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Company" label="Company" max_length="40" name="u_company" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return current.sys_import_set.number;  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Set  Number" max_length="40" name="set_number" read_only="true" type="string" virtual="true"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Item" label="Item" max_length="40" name="u_item" type="string"/>
+    </element>
+</database>

@@ -1,0 +1,1427 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[//判断是否firefox的浏览器
+var firefox = 0;
+
+//取得画面参数
+var name = gel('helloName').value;
+//alert("Hello, "+name);
+
+//取得server端的返回值
+var upd = gel('upd').value;
+if (upd) {
+	alert("收到，"+upd);
+	//gel('upd').value = "";
+}
+
+var doCancel = function() {
+	//gel('searchWord').text = "";
+	alert("I am canceled");
+	return false;
+};
+
+// 需要引入FileSaver.min.js和exceljs.min.js
+// 保存exceljs的文件
+var saveExceljs = function(workbook, fileName) {
+	// 导出文件
+	workbook.xlsx.writeBuffer().then(function(data) {
+		var blob = new Blob([data], { type: 'application/octet-stream' });
+		saveAs(blob, fileName);
+	});
+};
+
+// 需要引入exceljs.min.js
+// 根据参数做成并返回Excel Sheet
+// sheetOptions：设定Sheet的冻结表头的参数，可以不设
+var getExcelSheet = function(workbook, sheetName, 
+	titleColumns, subTitleColumns, dataRows, sheetOptions) {
+	if (typeof sheetOptions == 'undefined' || sheetOptions == null) {
+		sheetOptions = {};
+	}
+	var worksheet = workbook.addWorksheet(sheetName, sheetOptions);
+	//设置表头
+	worksheet.columns = titleColumns;
+	//设置副标题
+	if (!(typeof subTitleColumns == 'undefined' || subTitleColumns == null)) {
+		worksheet.addRows(subTitleColumns);
+	}
+	//设置数据
+	worksheet.addRows(dataRows);
+
+	return worksheet;
+};
+
+// 需要引入axios.min.js
+// getFile函数：通过axios从指定URL下载文件并返回Promise
+// 可以指定的文件类型有'json'，'arraybuffer'，'text'，'blob'
+var getFile = function(url, type) {
+	//设定默认type为blob
+	if (typeof type == 'undefined' || type == null) {
+		type = "blob";
+	}
+
+	return new Promise(function(resolve, reject) {
+		axios({
+			method: 'get',
+			url: url,
+			responseType: type
+		}).then(function(data) {
+			resolve(data.data);
+		}).catch(function(error) {
+			reject(error);
+		});
+	});
+};
+
+// 纯js方法，不需要引入外部包
+// getAjax函数：通过axios从指定Ajax函数返回结果给Promise
+var getAjax = function(url, functionName, params) {
+	//设定默认params为空
+	if (typeof params == 'undefined' || params == null) {
+		params = {};
+	}
+
+	return new Promise(function(resolve, reject) {
+		var ga = new GlideAjax(url);
+		ga.addParam('sysparm_name', functionName);
+		for (var key in params) {
+			ga.addParam('sysparm_' + key, params[key]);
+		}
+		ga.getXMLAnswer(function(answer) {
+			var jsonObj = JSON.parse(answer);
+			if (jsonObj.result == "ok") {
+				resolve(jsonObj);
+			} else {
+				reject(jsonObj);
+			}
+		});
+	});
+};
+
+/*
+//延迟执行关闭窗口
+setTimeout(function(){
+	if(firefox) {
+		var opened=window.open('about:blank','_self');   
+		opened.opener=null;
+		opened.close();
+	} else {  
+		window.opener = null;
+		window.open('', '_self');
+		window.close();
+	}
+}, 5000); //单位是毫秒
+*/
+
+var clients = [
+	{ "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
+	{ "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
+	{ "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
+	{ "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
+	{ "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
+];
+
+var countries = [
+	{ Name: "", Id: 0 },
+	{ Name: "United States", Id: 1 },
+	{ Name: "Canada", Id: 2 },
+	{ Name: "United Kingdom", Id: 3 }
+];
+
+var currentData = 1;
+
+var data1 = [
+	{"item": "T1", "company": "sh", "p4": 10, "p5": 15},
+	{"item": "T2", "company": "sh", "p4": 20}
+
+];
+
+var column1 = [
+	{ name: "item", title: "Item", type: "text", width: 50, validate: "required" },
+	{ name: "company", title: "Company", type: "text", width: 50 },
+	{ name: "p4", title: "P4", type: "number", width: 50 },
+	{ name: "s4", title: "S4", type: "number", width: 50 },
+	{ name: "p5", title: "P5", type: "number", width: 50 },
+	{ name: "s5", title: "S5", type: "number", width: 50 }
+];
+
+var data2 = [
+	{"item": "T1", "company": "sh", "p5": 30, "s5": 50},
+	{"item": "T2", "company": "sh", "p5": 60}
+
+];
+
+var column2 = [
+	{ name: "item", title: "Item", type: "text", width: 50, validate: "required" },
+	{ name: "company", title: "Company", type: "text", width: 50 },
+	{ name: "p5", title: "P-5", type: "number", width: 50 },
+	{ name: "s5", title: "S-5", type: "number", width: 50 }
+];
+
+var dates = null;
+getAjax('x_58872_needit.GetCalendar', 'getThisMonth', null)
+	.then(function(data) {
+		dates = data.datas;
+		alert("ThisMonth="+dates);
+	})
+	.catch(function(data) {
+		alert("获取日期数据失败："+data.message);
+	});
+
+//获取附件id号
+var attachmentId = "";
+//var attachmentParams = {table_name: "x_58872_needit_t0", record_id: "0c3245599379c210868ab4de3bba1029"};
+var attachmentParams = {table_name: "x_58872_needit_t0", file_name: "simple-demo.xlsx"};
+getAjax('x_58872_needit.GetAttachmentId', 'getFromTable', attachmentParams)
+	.then(function(data) {
+		attachmentId = data.id;
+		//alert("附件="+attachmentId);
+	})
+	.catch(function(data) {
+		alert("没有取到附件");
+	});
+
+//获取数据
+var gridDatas = [];
+getAjax('x_58872_needit.RefreshPsiChange', 'collect', {type: "ccc"})
+	.then(function(data) {
+		gridDatas = data.records;
+
+		$j("#jsGrid").jsGrid({
+			width: "100%",
+			//height: "600px",
+
+			filtering: false,
+			editing: false,
+			sorting: true,
+			paging: true,
+
+			pageSize: 10,
+			pageButtonCount: 5,
+
+			data: data1,
+
+			fields: column1
+		});
+		// $j("#jsGrid").DataTable({
+		// 	//info: false,
+		// 	//ordering: false,
+		// 	//paging: false,
+		// 	searching: false,
+		// 	scrollX: true,
+		// 	//scrollY: 300,
+		// 	layout: {
+		// 		topStart: null
+		// 	},
+
+		// 	data: gridDatas,
+		// 	columns: [
+		// 		{ data: 'item' },
+		// 		{ data: 'company' },
+		// 		{ data: 'p4' },
+		// 		{ data: 's4' },
+		// 		{ data: 'p5' },
+		// 		{ data: 's5' }
+		// 	]
+		// });
+	});
+
+var getTitleColumns = function() {
+	return [
+		{ header: 'Item', key: 'item', width: 10 },
+		{ header: 'Company', key: 'company', width: 32 },
+		{ header: 'P4', key: 'p4', width: 10, outlineLevel: 1 },
+		{ header: 'S4', key: 's4', width: 10, outlineLevel: 1 },
+		{ header: 'SUM', key: 'SUM', width: 10 },
+		{ header: 'P5', key: 'p5', width: 10, outlineLevel: 1 },
+		{ header: 'S5', key: 's5', width: 10, outlineLevel: 1 },
+		{ header: 'SUM1', key: 'SUM1', width: 10 }
+	];
+};
+
+var getSubTitleColumns = function() {
+	return [
+		{item:null, company:null, p4:'各种值', s4:null, SUM:null, p5:'各种值1', s5:null, SUM1:null},
+		{item:'Item', company:'Company', p4:'P4', s4:'S4', SUM:'SUM', p5:'P5', s5:'S5', SUM1:'SUM1'}
+	];
+};
+
+// 绑定按钮事件
+
+$j("#xport").bind('click', function() {
+	/* dynamically import the scripts in the event listener */
+	var workbook = new ExcelJS.Workbook();
+	var promises = [];  // 用于存储下载文件的Promise数组
+
+	//获取Sheet1的数据
+	var url1 = '/x_58872_needit_u0_list.do?JSONv2';
+	var promise1 = getFile(url1, 'json').then(function(data) {
+		var jsonDatas = data.records;
+		var utility = new Utility();
+
+		// 修正数据类型（把数值类型的字符串转换为数值类型）
+		jsonDatas.forEach(function(item, index) {
+			utility.typeTransform(item, "p4", "number");
+			utility.typeTransform(item, "s4", "number");
+			utility.typeTransform(item, "p5", "number");
+			utility.typeTransform(item, "s5", "number");
+		});
+
+		var worksheet = getExcelSheet(
+			workbook, 'My Sheet1', getTitleColumns(), 
+			getSubTitleColumns(), jsonDatas,
+			{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
+		);
+		
+		// 给表头添加背景色
+		var headerRow = worksheet.getRow(1);
+		// 通过 cell 设置样式，更精准
+		headerRow.eachCell(function(cell, colNum) {
+			// 设置背景色
+			cell.fill = {
+			type: 'pattern',
+			pattern: 'solid',
+			fgColor: { argb: 'dff8ff' }
+			};
+			// 设置字体
+			cell.font = {
+			bold: true,
+			italic: true,
+			//size: 12,
+			//name: '微软雅黑',
+			color: { argb: 'ff0000' }
+			};
+		});
+		// 使行隐藏
+		headerRow.hidden = true;
+		
+		var boldFontStyle = {
+			bold: true,
+			italic: true
+		};
+		// 设置合计列的样式
+		var formatCol = worksheet.getColumn('SUM');
+		formatCol.font = boldFontStyle;
+		formatCol = worksheet.getColumn('SUM1');
+		formatCol.font = boldFontStyle;
+		
+		var numFmt = "0.00";
+		//设定数字字段的格式
+		worksheet.getColumn('p4').numFmt = numFmt;
+		worksheet.getColumn('s4').numFmt = numFmt; 
+		worksheet.getColumn('SUM').numFmt = numFmt;
+
+		//合并单元格
+		//注意：要在合并单元格前将数据填充进去
+		worksheet.mergeCells('C2:E2');
+		worksheet.getCell("C2").fill = {
+			type: 'pattern',
+			pattern: 'solid',
+			fgColor: { argb: 'DFF8FF' }
+		};
+		worksheet.mergeCells('F2:H2');
+		worksheet.getCell("F2").fill = {
+			type: 'pattern',
+			pattern: 'solid',
+			fgColor: { argb: 'E9E917' }
+		};
+
+		//设置公式
+		var formulaCol = worksheet.getColumn('SUM');
+		formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+			// 从第4行开始设置({formula: "SUM(C4,D4)", result: 0})
+			if (rowNumber >= 4) {
+				var formulaVal = "SUM".concat("(", "C"+rowNumber, ",", "D"+rowNumber, ")");
+				cell.value = {formula: formulaVal, result: cell.value};
+			}
+		});
+		formulaCol = worksheet.getColumn('SUM1');
+		formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+			// 从第4行开始设置({formula: "SUM(F4,G4)", result: 0})
+			if (rowNumber >= 4) {
+				var formulaVal = "SUM".concat("(", "F"+rowNumber, ",", "G"+rowNumber, ")");
+				cell.value = {formula: formulaVal, result: cell.value};
+			}
+		});
+
+		//设置字段筛选
+		worksheet.autoFilter = 'A3:H3';
+	});
+	promises.push(promise1);
+
+	//获取Sheet2的数据
+	if (gridDatas.length == 0) {
+		var url2 = 'x_58872_needit.RefreshPsiChange';
+		var promise2 = getAjax(url2, 'collect', {type: "ccc"}).then(function(data) {
+			var jsonDatas = data.records;
+
+			var worksheet = getExcelSheet(
+				workbook, 'My Sheet2', getTitleColumns(), 
+				getSubTitleColumns(), jsonDatas,
+				{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
+			);
+			
+			// 给表头添加背景色
+			var headerRow = worksheet.getRow(1);
+			// 使行隐藏
+			headerRow.hidden = true;
+			//设置字段筛选
+			worksheet.autoFilter = 'A3:H3';
+		});
+		promises.push(promise2);
+	} else {
+			var worksheet = getExcelSheet(
+				workbook, 'My Sheet2', getTitleColumns(), 
+				getSubTitleColumns(), gridDatas,
+				{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
+			);
+			
+			// 给表头添加背景色
+			var headerRow = worksheet.getRow(1);
+			// 使行隐藏
+			headerRow.hidden = true;
+			//设置字段筛选
+			worksheet.autoFilter = 'A3:H3';
+	}
+
+	// 等待所有文件处理完成
+	Promise.all(promises).then(function() {
+		// 导出excel
+		saveExceljs(workbook, 'simple-demo1.xlsx');
+	});
+
+	
+	/* dynamically import the scripts in the event listener 
+	const promises = [];  // 用于存储下载文件的Promise数组
+	const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs");
+	const cptable = await import("https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/cpexcel.full.mjs");
+	XLSX.set_cptable(cptable);
+
+	const wb = XLSX.utils.book_new();
+	const ws = XLSX.utils.aoa_to_sheet([[null, "Name", "Birthday"], ["1", "2", "3"]], {header: 3});
+	//XLSX.utils.sheet_add_aoa(ws, [["a","b","c"]], { origin: "A2" });
+	//if (data) {
+	//	XLSX.utils.sheet_add_aoa(ws, data, { origin: "A3" });
+	//}
+	const url = "/x_58872_needit_u0_list.do?CSV";
+	const promise = getFile(url, "text").then(data => {
+		//拆分行
+		var result = data.toString().split("\n");
+		//把csv改为二维数组
+		csvDatas = result.map(x => x.replaceAll("\",\"", "\t").replaceAll("\"", "").split("\t"));
+	});
+	promises.push(promise);
+	// 等待所有文件处理完成
+	Promise.all(promises).then(() => {
+		//var blob = new Blob([csvDatas]), {type: "text/plain;charset=utf-8"});
+		//saveAs(blob, "文件导出测试.txt");
+		XLSX.utils.sheet_add_aoa(ws, csvDatas, { origin: "A3" });
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		XLSX.writeFile(wb, "SheetJSESMTest.xlsx", { compression: true });
+	});
+	*/
+});
+
+$j('#browseButton').click(function() {
+	$j('#fileInput').click();
+});
+
+$j('#fileInput').change(function() {
+	var name = $j('#fileInput').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#fileInput').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	/* read Text 
+	reader.readAsText(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#fileInput').val("");
+
+		$j('#upd').text(this.result);
+	};
+	*/
+	/* read ArrayBuffer */
+	reader.readAsArrayBuffer(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#fileInput').val("");
+
+		var workbook = new ExcelJS.Workbook();
+		workbook.xlsx.load(this.result).then(function(data) {
+			worksheet = workbook.getWorksheet(1);
+			/* 测试代码
+			var myColumns = [{key:"c1"},{key:"c2"},{key:"c3"},{key:"c4"},{key:"c5"},{key:"c6"},{key:"c7"},{key:"c8"},
+				{key:"c9"},{key:"c10"},{key:"c11"},{key:"c12"},{key:"c13"},{key:"c14"},{key:"c15"}];
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				//设置表头
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//worksheet.getCell('K25').value = "End";
+			alert("Cell name = "+worksheet.getCell('J11').name);
+			var idCol = worksheet.getColumn("c15");
+			// 迭代此列中的所有当前单元格
+			try {
+				idCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+					if (rowNumber == 39) {
+						cell.value = "End";
+						throw new Error('touch the end line');
+					}
+				});
+			} catch (e) {}
+			 */
+			/* 正式代码*/
+			var headrow = 5;
+			//判断表头是否一致
+			var myColumns = getTitleColumns();
+			var excelColumns = worksheet.getRow(headrow).values;
+			//excelColumns从数组1开始放正式数据，数组0不放数据
+			//if (myColumns.length != excelColumns.length-1) {
+			//	alert("File wrong! Expect "+myColumns.length+" columns, but has "+(excelColumns.length-1)+" columns.");
+			//	return;
+			//}
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				//表头不一致
+				//if (myColumns[i-1]["header"] != excelColumns[i]) {
+				//	alert("File wrong! Expect column "+i+" is "+myColumns[i-1]["header"]+", but it is "+excelColumns[i]);
+				//	return;
+				//}
+				//设置表头
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//设置数据
+			//worksheet.addRows(gridDatas);
+			//var foot = worksheet.spliceRows(6, 2);
+			//var newRow1 = {item:'one', company:'two'};
+			//var newRow2 = {item:'3', company:'4'};
+			var newRows = [
+				{company:'A', item:'one', p4:5, s4:null, SUM:null, p5:7, s5:null, SUM1:null},
+				{company:'B', item:'two', p4:6, s4:null, SUM:null, p5:8, s5:null, SUM1:null}];
+			var rowsCount = newRows.length;
+			for (var i = 0; i < rowsCount; i++) {
+				if (i < rowsCount - 1) {
+					//剪切并插入行（带空白行）
+					worksheet.spliceRows(headrow + 1 + i, 1, newRows[i], {});
+				} else {
+					//剪切并插入行
+					worksheet.spliceRows(headrow + 1 + i, 1, newRows[i]);
+				}
+			}
+			//重新设置foot行的公式
+			var footRow = worksheet.getRow(headrow+rowsCount+1);
+			var footCell = footRow.getCell('p4');
+			var cellFormula = footCell.value.formula.replaceAll("C6", "C"+(headrow+rowsCount));
+			footCell.value = {formula: cellFormula, result: 0};
+			/*
+			//设置公式
+			var formulaCol = worksheet.getColumn('SUM');
+			formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				// 从第4行开始设置({formula: "SUM(C4,D4)", result: 0})
+				if (rowNumber > headrow) {
+					var formulaVal = "SUM".concat("(", "C"+rowNumber, ",", "D"+rowNumber, ")");
+					cell.value = {formula: formulaVal, result: cell.value};
+				}
+			});
+			formulaCol = worksheet.getColumn('SUM1');
+			formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				// 从第4行开始设置({formula: "SUM(F4,G4)", result: 0})
+				if (rowNumber > headrow) {
+					var formulaVal = "SUM".concat("(", "F"+rowNumber, ",", "G"+rowNumber, ")");
+					cell.value = {formula: formulaVal, result: cell.value};
+				}
+			});
+			*/
+			// 遍历工作表中的所有行（包括空行）,并设置边框
+			var borderStyle = {
+				top: {style:'thin'},
+				left: {style:'thin'},
+				bottom: {style:'thin'},
+				right: {style:'thin'}
+			};
+			worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+				if (rowNumber > headrow && rowNumber <= headrow+rowsCount) {
+					row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+						cell.border = borderStyle;
+					});
+				}
+			});
+
+			//测试第二个Sheet
+			var worksheet2 = workbook.getWorksheet(2);
+			worksheet2.getCell("A3").value = "测试写入";
+
+
+			// 导出excel
+			saveExceljs(workbook, 'simple-demo2.xlsx');
+		}).catch(function(error) {
+			alert(error.message);
+		});
+
+	};
+});
+
+$j('#down').click(function() { //attachmentId
+	if (attachmentId == "") {
+		alert("没有设定模板文件");
+		return;
+	}
+	//var url = 'https://dev196248.service-now.com/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=f70f7de8932a0210868ab4de3bba10be';
+	var url = "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId;
+	getFile(url, 'arraybuffer').then(function(buff) {
+		var workbook = new ExcelJS.Workbook();
+		workbook.xlsx.load(buff).then(function(data) {
+			worksheet = workbook.getWorksheet(1);
+			var headrow = 5;
+			//判断表头是否一致
+			var myColumns = getTitleColumns();
+			var excelColumns = worksheet.getRow(headrow).values;
+			//excelColumns从数组1开始放正式数据，数组0不放数据
+			if (myColumns.length != excelColumns.length-1) {
+				alert("File wrong! Expect "+myColumns.length+" columns, but has "+(excelColumns.length-1)+" columns.");
+				return;
+			}
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				//表头不一致
+				if (myColumns[i-1]["header"] != excelColumns[i]) {
+					alert("File wrong! Expect column "+i+" is "+myColumns[i-1]["header"]+", but it is "+excelColumns[i]);
+					return;
+				}
+				//设置表头
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//设置数据
+			worksheet.addRows(gridDatas);
+			//设置公式
+			var formulaCol = worksheet.getColumn('SUM');
+			formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				// 从第4行开始设置({formula: "SUM(C4,D4)", result: 0})
+				if (rowNumber > headrow) {
+					var formulaVal = "SUM".concat("(", "C"+rowNumber, ",", "D"+rowNumber, ")");
+					cell.value = {formula: formulaVal, result: cell.value};
+				}
+			});
+			formulaCol = worksheet.getColumn('SUM1');
+			formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				// 从第4行开始设置({formula: "SUM(F4,G4)", result: 0})
+				if (rowNumber > headrow) {
+					var formulaVal = "SUM".concat("(", "F"+rowNumber, ",", "G"+rowNumber, ")");
+					cell.value = {formula: formulaVal, result: cell.value};
+				}
+			});
+			// 遍历工作表中的所有行（包括空行）,并设置边框
+			var borderStyle = {
+				top: {style:'thin'},
+				left: {style:'thin'},
+				bottom: {style:'thin'},
+				right: {style:'thin'}
+			};
+			worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+				if (rowNumber > headrow) {
+					row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+						cell.border = borderStyle;
+					});
+				}
+			});
+			// 导出excel
+			saveExceljs(workbook, 'simple-demo3.xlsx');
+		}).catch(function(error) {
+			alert(error.message);
+		});
+	});
+});
+
+$j('#packing_down').click(function() { //attachmentId
+	var promises = [];  // 用于存储下载文件的Promise数组
+	var workbook = new ExcelJS.Workbook();
+	var packingData = [];
+	var footData = {};
+
+	var url1 = '/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=55d99fd8933e8610868ab4de3bba1056';
+	var promise1 = getFile(url1, 'arraybuffer')
+		.then(function(buff) {
+			return workbook.xlsx.load(buff);
+		});
+	promises.push(promise1);
+
+	var url2 = 'x_58872_needit.GetPackingData';
+	var promise2 = getAjax(url2, 'getByInvoiceNo', {"invoice_no": "FGS23044778"})
+		.then(function(data) {
+			packingData = data.records;
+			footData = data.totals;
+		});
+	promises.push(promise2);
+
+	// 等待所有文件处理完成
+	Promise.all(promises)
+		.then(function() {
+			worksheet = workbook.getWorksheet(1);
+			//设置表头
+			var myColumns = [{key:"c1"},{key:"c2"},{key:"c3"},{key:"Item"},{key:"c5"},{key:"Quantity"},{key:"c7"},{key:"N/W"},
+				{key:"G/W"},{key:"M3"},{key:"c11"},{key:"c12"},{key:"c13"},{key:"c14"},{key:"c15"}];
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//设置数据
+			var headrow = 28;
+			var rowsCount = packingData.length;
+			for (var i = 0; i < rowsCount; i++) {
+				if (i < rowsCount - 1) {
+					//剪切并插入行（带空白行）
+					worksheet.spliceRows(headrow + 1 + i, 1, packingData[i], {});
+				} else {
+					//剪切并插入行
+					worksheet.spliceRows(headrow + 1 + i, 1, packingData[i]);
+				}
+			}
+			//设置foot
+			var footrow = 0;
+			if (rowsCount == 0) {
+				footrow = headrow + 3;
+			} else {
+				footrow = headrow + rowsCount + 2;
+			}
+			var row = worksheet.getRow(footrow);
+			row.getCell("Quantity").value = footData["Quantity"];
+			row.getCell("N/W").value = footData["N/W"];
+			row.getCell("G/W").value = footData["G/W"];
+			row.getCell("M3").value = footData["M3"];
+
+			// 导出excel
+			saveExceljs(workbook, 'simple-demo5.xlsx');
+		}).catch(function(error) {
+			alert("发生错误："+error.message);
+		});
+});
+
+$j('#down_csv').click(function() {
+	$j('#csvDown').click();
+});
+
+$j('#csvDown').change(function() {
+	var name = $j('#csvDown').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#csvDown').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	var utility = new Utility();
+	/* read ArrayBuffer */
+	reader.readAsArrayBuffer(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#csvDown').val("");
+
+		var workbook = new ExcelJS.Workbook();
+		workbook.xlsx.load(this.result).then(function(data) {
+			worksheet = workbook.getWorksheet(1);
+			/* 测试代码 */
+			var myColumns = [{key:"c1"},{key:"c2"},{key:"c3"},{key:"Item"},{key:"c5"},{key:"Quantity"},{key:"c7"},{key:"N/W"},
+				{key:"G/W"},{key:"M3"},{key:"c11"},{key:"c12"},{key:"c13"},{key:"c14"},{key:"c15"}];
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				//设置表头
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//worksheet.getCell('K25').value = "End";
+			//alert("Cell name = "+worksheet.getCell('J11').name);
+			var invoiceNo = utility.transformString(worksheet.getCell('F6').value);
+			var csvDatas = [];
+			var firstDataLine = 29;
+			try {
+				//var idCol = worksheet.getColumn("c15");
+				//// 迭代此列中的所有当前单元格
+				//idCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				//	if (rowNumber == 39) {
+				//		cell.value = "End";
+				//		throw new Error('touch the end line');
+				//	}
+				//});
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber >= firstDataLine) {
+						var item = utility.transformString(row.getCell('Item').value);
+						if (item == null || item.trim() == "") {
+							throw new Error('touch the end line');
+						}
+						var line = {
+							"InvoiceNo": invoiceNo,
+							"Item": item,
+							"Quantity": row.getCell('Quantity').value,
+							"N/W": row.getCell('N/W').value,
+							"G/W": row.getCell('G/W').value,
+							"M3": row.getCell('M3').value
+						};
+						csvDatas.push(line);
+					}
+				});
+			} catch (e) {}
+
+			// 导出excel
+			//saveExceljs(workbook, 'simple-demo2.xlsx');
+
+			//重新排列csv数据
+			//var cols = getTitleColumns();
+			//var csvDatas = gridDatas.map(function(obj) {
+			//	var line = {
+			//		Item: obj.item,
+			//		Company: obj.company,
+			//		P4: obj.p4,
+			//		S4: obj.s4,
+			//		SUM: obj.p4 + obj.s4,
+			//		P5: obj.p5,
+			//		S5: obj.s5,
+			//		SUM1: obj.p5 + obj.s5
+			//	};
+			//	return line;
+			//});
+			var BOM = '\uFEFF';
+			var buff = Papa.unparse(csvDatas);
+			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "文件导出测试2.txt");
+		}).catch(function(error) {
+			alert(error.message);
+		});
+
+	};
+});
+
+$j('#upd_csv').click(function() {
+	$j('#csvInput').click();
+});
+
+$j('#csvInput').change(function() {
+	var name = $j('#csvInput').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#csvInput').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	/* read Text */
+	reader.readAsText(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#csvInput').val("");
+
+		//$j('#upd').text(this.result);
+		var buff = Papa.parse(this.result, {
+			delimiter: ",", header: true
+		});
+		//alert(JSON.stringify(buff));
+
+		//转换数据格式
+		var utility = new Utility();
+		var csvDatas = buff.data.map(function(obj) {
+			var line = {
+				"item": obj.Item,
+				"company": obj.Company,
+				"p4": utility.transformNumber(obj.P4),
+				"s4": utility.transformNumber(obj.S4),
+				"SUM": utility.transformNumber(obj.SUM),
+				"p5": utility.transformNumber(obj.P5),
+				"s5": utility.transformNumber(obj.S5),
+				"SUM1": utility.transformNumber(obj.SUM1)
+			};
+			return line;
+		});
+		//alert(JSON.stringify(csvDatas));
+
+		//var url = 'https://dev196248.service-now.com/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=f70f7de8932a0210868ab4de3bba10be';
+		var url = "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId;
+		getFile(url, 'arraybuffer').then(function(buff) {
+			var workbook = new ExcelJS.Workbook();
+			workbook.xlsx.load(buff).then(function(data) {
+				worksheet = workbook.getWorksheet(1);
+				var headrow = 5;
+				//判断表头是否一致
+				var myColumns = getTitleColumns();
+				var excelColumns = worksheet.getRow(headrow).values;
+				//excelColumns从数组1开始放正式数据，数组0不放数据
+				if (myColumns.length != excelColumns.length-1) {
+					alert("File wrong! Expect "+myColumns.length+" columns, but has "+(excelColumns.length-1)+" columns.");
+					return;
+				}
+				for (i = 1, len = myColumns.length; i <= len; i++) {
+					//表头不一致
+					if (myColumns[i-1]["header"] != excelColumns[i]) {
+						alert("File wrong! Expect column "+i+" is "+myColumns[i-1]["header"]+", but it is "+excelColumns[i]);
+						return;
+					}
+					//设置表头
+					worksheet.getColumn(i).key = myColumns[i-1]["key"];
+				}
+				//设置数据
+				worksheet.addRows(csvDatas);
+				//设置公式
+				var formulaCol = worksheet.getColumn('SUM');
+				formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+					// 从第4行开始设置({formula: "SUM(C4,D4)", result: 0})
+					if (rowNumber > headrow) {
+						var formulaVal = "SUM".concat("(", "C"+rowNumber, ",", "D"+rowNumber, ")");
+						cell.value = {formula: formulaVal, result: cell.value};
+					}
+				});
+				formulaCol = worksheet.getColumn('SUM1');
+				formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+					// 从第4行开始设置({formula: "SUM(F4,G4)", result: 0})
+					if (rowNumber > headrow) {
+						var formulaVal = "SUM".concat("(", "F"+rowNumber, ",", "G"+rowNumber, ")");
+						cell.value = {formula: formulaVal, result: cell.value};
+					}
+				});
+				// 遍历工作表中的所有行（包括空行）,并设置边框
+				var borderStyle = {
+					top: {style:'thin'},
+					left: {style:'thin'},
+					bottom: {style:'thin'},
+					right: {style:'thin'}
+				};
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber > headrow) {
+						row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+							cell.border = borderStyle;
+						});
+					}
+				});
+				// 导出excel
+				saveExceljs(workbook, 'simple-demo4.xlsx');
+			}).catch(function(error) {
+				alert(error.message);
+			});
+		});
+	};
+	
+});
+
+$j('#down_zip').click(function() {
+	var zip = new JSZip();
+	var fileData = [{fileName: "file1.xlsx", url: "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId},
+		{fileName: "file2.csv", url: "/x_58872_needit_u0_list.do?CSV"}];
+	var promises = [];  // 用于存储下载文件的Promise数组
+
+	// 处理文件数据
+	//zip.file("file.txt", "content3\r\ncontent4");
+	fileData.forEach(function(item, index) {
+		var  promise = null;
+		if (index == 0) {
+			//根据模板设定数据并返回blob数据源
+			var workbook = new ExcelJS.Workbook();
+			var headrow = 5;
+			promise = getFile(item.url, 'arraybuffer')
+				.then(function(buff) {
+					return workbook.xlsx.load(buff);
+				}).then(function(data) {
+					var worksheet = workbook.getWorksheet(1);
+					//设置表头
+					var myColumns = getTitleColumns();
+					for (i = 1, len = myColumns.length; i <= len; i++) {
+						worksheet.getColumn(i).key = myColumns[i-1]["key"];
+					}
+					//设置数据
+					worksheet.addRows(gridDatas);
+					//设置公式
+					var formulaCol = worksheet.getColumn('SUM');
+					formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+						// 从第4行开始设置({formula: "SUM(C4,D4)", result: 0})
+						if (rowNumber > headrow) {
+							var formulaVal = "SUM".concat("(", "C"+rowNumber, ",", "D"+rowNumber, ")");
+							cell.value = {formula: formulaVal, result: cell.value};
+						}
+					});
+					formulaCol = worksheet.getColumn('SUM1');
+					formulaCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+						// 从第4行开始设置({formula: "SUM(F4,G4)", result: 0})
+						if (rowNumber > headrow) {
+							var formulaVal = "SUM".concat("(", "F"+rowNumber, ",", "G"+rowNumber, ")");
+							cell.value = {formula: formulaVal, result: cell.value};
+						}
+					});
+					
+					// 导出文件
+					return workbook.xlsx.writeBuffer();
+				}).then(function(blobData) {
+					var blob = new Blob([blobData], { type: 'application/octet-stream' });
+					zip.file(item.fileName, blob, { binary: true });  // 将文件逐个添加到Zip文件
+				});
+		} else {
+			//直接获取数据文件
+			promise = getFile(item.url, 'blob').then(function(buff) {
+				zip.file(item.fileName, buff, { binary: true });  // 将文件逐个添加到Zip文件
+			});
+		}
+		promises.push(promise);
+	});
+	
+	// 等待所有文件处理完成
+	Promise.all(promises).then(function() {
+		//追加其他文本文件
+		var buff = "Invoice NO,Total packages,Total packages unit1,Quantity,Total net kgs";
+		buff = buff + "\r\n" + "S0001,1000,2000,3000,4000";
+		buff = buff + "\r\n" + "S0002,5000,6000,7000,8000";
+		//直接设定数据
+		zip.file("file3.csv", buff);
+		// 生成Zip文件并保存
+		zip.generateAsync({type: 'blob'}).then(function(content) {
+			saveAs(content, "hello.zip");
+		});
+	});
+});
+
+$j('#save_excel').click(function() {
+	$j('#excelSave').click();
+});
+
+$j('#excelSave').change(function() {
+	var name = $j('#excelSave').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#excelSave').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	/* read Text */
+	reader.readAsArrayBuffer(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#excelSave').val("");
+
+		var workbook = new ExcelJS.Workbook();
+		var utility = new Utility();
+		workbook.xlsx.load(this.result).then(function(data) {
+			worksheet = workbook.getWorksheet(1);
+			/* 测试代码 */
+			var myColumns = [{key:"c1"},{key:"c2"},{key:"Total"},{key:"Item"},{key:"c5"},{key:"Quantity"},{key:"c7"},{key:"N/W"},
+				{key:"G/W"},{key:"M3"},{key:"c11"},{key:"c12"},{key:"c13"},{key:"c14"},{key:"c15"}];
+			for (i = 1, len = myColumns.length; i <= len; i++) {
+				//设置表头
+				worksheet.getColumn(i).key = myColumns[i-1]["key"];
+			}
+			//获取数据
+			var invoiceNo = worksheet.getCell('F6').value;
+			//worksheet.getCell('K25').value = "End";
+			//alert("Cell name = "+worksheet.getCell('J11').name);
+			var csvDatas = [];
+			var firstDataRow = 29;
+			var lastDataRow = firstDataRow;
+			try {
+				//var idCol = worksheet.getColumn("c15");
+				//// 迭代此列中的所有当前单元格
+				//idCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+				//	if (rowNumber == 39) {
+				//		cell.value = "End";
+				//		throw new Error('touch the end line');
+				//	}
+				//});
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber >= firstDataRow) {
+						var item = utility.transformString(row.getCell('Item').value);
+						//alert("row="+rowNumber+", item="+item);
+						if (item == null || item.trim() == "") {
+							throw new Error('touch the end data line');
+						}
+						var line = {
+							"invoice_no": invoiceNo,
+							"item": item,
+							"quantity": row.getCell('Quantity').value,
+							"n_w": row.getCell('N/W').value,
+							"g_w": row.getCell('G/W').value,
+							"m3": row.getCell('M3').value
+						};
+						csvDatas.push(line);
+						lastDataRow = rowNumber;
+					}
+				});
+			} catch (ex) {}
+			var saveData = JSON.stringify(csvDatas);
+			//alert(saveData);
+
+			//获取合计行
+			var totalData = {"invoice_no": invoiceNo};
+			var findTotalLine = false;
+			try {
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber > lastDataRow) {
+						var item = utility.transformString(row.getCell('Total').value);
+						if (item != null && item.trim().toUpperCase() == "TOTAL:") {
+							totalData["total_quantity"] = row.getCell('Quantity').value;
+							totalData["total_n_w"] = row.getCell('N/W').value;
+							totalData["total_g_w"] = row.getCell('G/W').value;
+							totalData["total_m3"] = row.getCell('M3').value;
+
+							// 发现total行后退出循环
+							findTotalLine = true;
+							throw new Error('find total line');
+						} 
+					}
+				});
+			} catch (ex) {}
+			//如果没有发现合计行，填入空的合计值
+			if (!findTotalLine) {
+				totalData["total_quantity"] = 0;
+				totalData["total_n_w"] = 0;
+				totalData["total_g_w"] = 0;
+				totalData["total_m3"] = 0;
+			}
+			var invoiceData = JSON.stringify(totalData);
+
+			// 保存数据
+			var params = {
+				"invoice_data": invoiceData,
+				"record_data": saveData
+			};
+			getAjax('x_58872_needit.SavePsiData', 'save', params)
+				.then(function(data) {
+					alert("已保存");
+				})
+				.catch(function(ex) {
+					alert(ex.message);
+				});
+		}).catch(function(error) {
+			alert(error.message);
+		});
+	};
+});
+
+$j('#save_excel2').click(function() {
+	getAjax('x_58872_needit.ExcelParser', 'packing', {})
+		.then(function(data) {
+			data.records.forEach(function(item, index) {
+				//alert("col"+index+"="+item);
+			});
+		})
+		.catch(function(data) {
+			alert("执行失败："+data.message);
+		});
+});
+
+$j('#transform1').click(function() {
+	$j('#transform1Input').click();
+});
+
+$j('#transform1Input').change(function() {
+	var name = $j('#transform1Input').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#transform1Input').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	/* read Text */
+	reader.readAsArrayBuffer(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#transform1Input').val("");
+
+		var workbook = new ExcelJS.Workbook();
+		var utility = new Utility();
+		workbook.xlsx.load(this.result).then(function(data) {
+			worksheet = workbook.getWorksheet(1);
+
+			var firstDataLine = 2;
+			var firstDataColumn = 6;
+			var csvDatas = [];
+			var cols = [""];
+			//获取表头
+			var headRow = worksheet.getRow(1);
+			headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+				cols.push(utility.transformString(cell.value));
+				// if (colNumber < firstDataColumn) {
+				// 	cols.push(cell.text);
+				// } else {
+				// 	cols.push(utility.dateToString(cell.value));
+				// }
+			});
+			//设置表头
+			for (i = 1, len = cols.length; i < len; i++) {
+				worksheet.getColumn(i).key = cols[i];
+			}
+			//获取数据
+			try {
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber >= firstDataLine) {
+						var item = row.getCell('機種').text;
+						if (item == null || item.trim() == "") {
+							throw new Error('touch the end line');
+						}
+						row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+							if (colNumber >= firstDataColumn) {
+								var val = cell.value;
+								if (val) {
+									var line = {
+										"機種": item,
+										"販社": row.getCell('販社').text,
+										"仕向地": row.getCell('仕向地').text,
+										"PSI": row.getCell('PSI').text,
+										"日期": cols[colNumber],
+										"数量": val
+									};
+									csvDatas.push(line);
+								}
+							}
+						});
+					}
+				});
+			} catch (e) {}
+
+			var BOM = '\uFEFF';
+			var buff = Papa.unparse(csvDatas);
+			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "文件导出测试3.csv");
+		}).catch(function(error) {
+			alert(error.message);
+		});
+	};
+});
+
+$j('#change_data').click(function() {
+	var d = null;
+	var c = null;
+
+	if (currentData == 1) {
+		d = data2;
+		c = column2;
+		currentData = 2;
+	} else {
+		d = data1;
+		c = column1;
+		currentData = 1;
+	}
+	$j("#jsGrid").jsGrid({
+		width: "100%",
+		//height: "600px",
+
+		filtering: false,
+		editing: false,
+		sorting: true,
+		paging: true,
+
+		pageSize: 10,
+		pageButtonCount: 5,
+
+		data: d,
+
+		fields: c
+	});
+});
+
+$j('#get_date').click(function() {
+	var dt = new GlideDateTime();
+	alert(dt.getDisplayValue());
+});]]></client_script>
+        <description/>
+        <direct>false</direct>
+        <endpoint>x_58872_needit_sample_page.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+
+<g:evaluate>
+	//定义searchWord的初始值
+	if (typeof searchWord == "undefined") {
+		var searchWord = "";
+	}
+	//定义upd的初始值
+	if (typeof upd == "undefined") {
+		var upd = "";
+	}
+	//定义helloName的初始值
+	if (typeof helloName == "undefined") {
+		//获取url参数
+		var helloName = RP.getParameterValue("sysparm_fullname");
+		if (helloName == "" || helloName == null) {
+			helloName = "Everyone";
+		}
+	}
+</g:evaluate>
+
+<html>
+<head>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js" integrity="sha512-blBYtuTn9yEyWYuKLh8Faml5tT/5YPG0ir9XEABu5YCj7VGr2nb21WPFT9pnP4fcC3y0sSxJR1JqFTfTALGuPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net/2.0.8/dataTables.min.js" integrity="sha512-9nzwD31ljz7rSrA7/yOs/ynFwQT2s2m/k+BAOSI+kz8V/RpkV5bejsjHy8S2yE21ybt4ThoxQ0t4nwsnzQzeRQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js" integrity="sha512-dlPw+ytv/6JyepmelABrgeYgHI0O+frEwgfnPdXDTOIZz+eDgfW07QXG02/O8COfivBdGNINy+Vex+lYmJ5rxw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha512-Qlv6VSKh1gDKGoJbnyA5RMXYcvnpIqhO++MhIM2fStMcGT9i2T//tSwYFlcyoRRDcDZ+TYHpH8azBBCyhpSeqw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- <g:requires name="Utility.jsdbx"/> -->
+	<g:evaluate object="true">
+		var uiscripts = ["Utility"];
+		var jslibs = [];
+		for (var key in uiscripts) {
+			var gr = new GlideRecordSecure('sys_ui_script');	
+			gr.addQuery("name", uiscripts[key]);
+			gr.query();	
+			gr.next();	
+			jslibs.push( {"name": gr.name, "ts": gr.sys_updated_on } );	
+		}
+	</g:evaluate>	
+	<j:forEach var="jvar_js_lib" indexVar="jvar_js_index" items="${jslibs}">
+		<g:evaluate jelly="true">
+			var js_lib_name = jelly.jvar_js_lib.name;
+			var js_lib_ts = jelly.jvar_js_lib.ts;
+		</g:evaluate>
+		<g:requires name="${js_lib_name}.jsdbx" params="cache=${js_lib_ts}" />	
+	</j:forEach>
+	
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+	<!-- <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" /> -->
+	<style type="text/css">
+		.bottom_area table {
+			float: right;
+		}
+
+		.bottom_area th, td {
+			padding: 5px 5px;
+			border-top-width: 0;
+			border-left-width: 0;
+		}
+
+		.bottom_area button:hover {
+			background-color: yellow;
+		}
+	</style>
+</head>
+
+<body text="#FFFFFF">
+	<h1>${helloName}'s Homepage</h1>
+	<div class="bottom_area">
+		<table>
+			<tbody>
+				<tr>
+					<td><button id="xport">Export</button></td>
+					<td>
+						<input type="file" id="fileInput" style="display: none;"/>
+						<button id="browseButton">浏览</button>
+					</td>
+					<td><button id="down">直接下载</button></td>
+					<td><button id="packing_down">Packing下载</button></td>
+					<td>
+						<input type="file" id="excelSave" style="display: none;"/>
+						<button id="save_excel">直接上传</button>
+					</td>
+					<td>
+						<input type="file" id="csvDown" style="display: none;"/>
+						<button id="down_csv">Excel转CSV</button>
+					</td>
+					<td>
+						<input type="file" id="csvInput" style="display: none;"/>
+						<button id="upd_csv">CSV转Excel</button>
+					</td>
+					<td>
+						<button id="down_zip">zip下载</button>
+					</td>
+					<td>
+						<button id="save_excel2">直接上传2</button>
+					</td>
+					<td>
+						<input type="file" id="transform1Input" style="display: none;"/>
+						<button id="transform1">Excel数据转换1</button>
+					</td>
+					<td>
+						<button id="change_data">变更数据</button>
+					</td>
+					<td>
+						<button id="get_date">获取日期</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div id="jsGrid" class="jsgrid"></div>
+	<!-- <table id="jsGrid" class="display" style="width:100%">
+		<thead>
+			<tr>
+				<th>Item</th>
+				<th>Company</th>
+				<th>P4</th>
+				<th>S4</th>
+				<th>P5</th>
+				<th>S5</th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th>Item</th>
+				<th>Company</th>
+				<th>P4</th>
+				<th>S4</th>
+				<th>P5</th>
+				<th>S5</th>
+			</tr>
+		</tfoot>
+	</table> -->
+	<g:ui_form>
+		<table>
+			<tbody>
+				<tr>
+					<td>
+						<input type="text" class="form-control" name="searchWord" placeholder="条件" value="${searchWord}" cols="50"/>
+						<input name="application_sys_id" id="application_sys_id" value="499836460a0a0b1700003e7ad950b5da" type="hidden" />
+						<input name="helloName" id="helloName" value="${helloName}" type="hidden" />
+					</td>
+					<td>
+						<!-- <g:dialog_buttons_ok_cancel ok="return true" cancel="return doCancel()" /> -->
+						<button type="submit" id="submit_button"><span>提交</span></button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<textarea id="upd" name="upd" rows="4" cols="50" style="resize: none;">${upd}</textarea>
+					</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</g:ui_form>
+</body>
+</html>
+
+</j:jelly>]]></html>
+        <name>sample_page</name>
+        <processing_script><![CDATA[//var p_application = request.getParameter('application_sys_id'); //获取客户端参数的老式写法
+//var sysparm_fullname = request.getParameter('jvar_name'); //获取客户端参数的老式写法
+
+//从客户端获取参数，并最终通过定义var变量的形式把值返回给客户端
+//var searchWord = searchWord;
+//var helloName = helloName;
+//var upd = searchWord;
+//gs.info("MyDebug -INFO- Received form value for process ->" + application_sys_id);
+gs.info("MyDebug -INFO- Received form value for process ->" + helloName);
+gs.info("MyDebug -INFO- Received form value for process ->" + searchWord);
+gs.info("MyDebug -INFO- Received form value for process ->" + upd);
+
+//var urlOnStack = GlideSession.get().getStack().bottom();
+//response.sendRedirect(urlOnStack);
+// 转到特定的page
+// var uip = new GlideRecordSecure("sys_ui_page");
+// if (uip.get(this.sys_id)) {
+// 	var pageName = uip.getValue("endpoint");
+// 	var url = pageName + "?sysparm_fullname=" + helloName;
+
+// 	response.sendRedirect(encodeURI(url));
+// } else {
+// 	gs.error(">>>Error: Cannot load ui page: " + this.sys_id);
+// }
+
+]]></processing_script>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-05-14 03:12:55</sys_created_on>
+        <sys_id>6d4c0e9793020210868ab4de3bba101b</sys_id>
+        <sys_mod_count>951</sys_mod_count>
+        <sys_name>sample_page</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_page_6d4c0e9793020210868ab4de3bba101b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-25 10:03:11</sys_updated_on>
+    </sys_ui_page>
+</record_update>

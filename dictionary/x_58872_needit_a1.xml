@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="cdae8e90937d8610868ab4de3bba1004" label="A1" max_length="40" name="x_58872_needit_a1" type="collection">
+        <element label="Val1" max_length="40" name="val1" type="integer"/>
+        <element label="Mon" max_length="40" name="mon" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Month" max_length="40" name="month" type="glide_date"/>
+        <element choice="3" default="request" label="State" mandatory="true" max_length="40" name="state" type="string">
+            <choice>
+                <element inactive_on_update="false" label="Proceed" sequence="200" value="proceed"/>
+                <element inactive_on_update="false" label="Request" sequence="100" value="request"/>
+            </choice>
+        </element>
+        <element label="Val" max_length="40" name="val" type="integer"/>
+        <element calculation="(function calculatedFieldValue(c) {&#13;&#10;&#13;&#10;    // Add your code here&#13;&#10;    if (current.val) {&#13;&#10;        return current.val + 5; // return the calculated value&#13;&#10;    } else {&#13;&#10;        return null;&#13;&#10;    }&#13;&#10;&#13;&#10;&#13;&#10;})(current);" label="Val3" max_length="40" name="val3" read_only="true" type="integer" virtual="true"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Ref Item" max_length="32" name="ref_item" reference="x_58872_needit_t0" type="reference"/>
+        <element label="Item" max_length="40" name="item" type="string"/>
+        <element function_definition="glidefunction:add(glidefunction:coalesce(val1,val),1)" function_field="true" label="Val2" max_length="40" name="val2" read_only="true" type="integer"/>
+        <index name="index">
+            <element name="ref_item"/>
+        </index>
+    </element>
+</database>

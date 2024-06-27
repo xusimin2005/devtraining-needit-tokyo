@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.MyCalendar</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>MyCalendar</name>
+        <script><![CDATA[var MyCalendar = Class.create();
+MyCalendar.prototype = {
+    initialize: function() {
+		//一年的周数
+		this.year_month_count = 52;
+		//日历表的名称
+		this.calendar_table = "x_58872_needit_c0";
+		//检索结果
+		this.datas = [];
+		//检索异常时设定
+		this.message = "";
+    },
+
+	//检索当日的情报
+	getToday: function() {
+		//获得系统日期
+		var gdt = new GlideDateTime();
+		var gdt_copy = new GlideDateTime(gdt);
+		gdt_copy.addDaysLocalTime(-1);
+		var today = {
+			"date": gdt.getDate().getDisplayValue(),
+			"year": gdt.getYearLocalTime(),
+			"month": gdt.getMonthLocalTime(),
+			"day_of_week": gdt.getDayOfWeekLocalTime(),
+			"week_of_year": gdt_copy.getWeekOfYearLocalTime()
+		};
+		return today;
+	},
+
+	//检索指定周的情报
+	getWeek: function(year, week) {
+		var m_count = this.year_month_count;
+		if (week < (-1)*(m_count-1) || week > (m_count*2)) {
+			this.message = "week超过1年的计算范围";
+			return false;
+		}
+		//去年的情报
+		if (week < 1) {
+			year = year - 1;
+			week = week + m_count;
+		} else if(week > m_count) { //明年的情报
+			year = year + 1;
+			week = week - m_count;
+		}
+
+		this.datas = [];
+		var gr = null;
+		try {
+			gr = new GlideRecord(this.calendar_table);
+			gr.addQuery('year', year);
+			gr.addQuery('week_of_year', week);
+			gr.orderBy('day_of_week');
+			gr.query();
+			while(gr.next()) {
+				this.datas.push(gr.getValue("date"));
+			}
+
+		} catch(ex) {
+			this.message = ex.message;
+			return false;
+		} finally {
+			//释放内存
+			gr = null;
+		}
+		return true;
+	},
+
+	//检索指定月的情报
+	getMonth: function(year, month) {
+		var m_count = 12;
+		if (month < (-1)*(m_count-1) || month > (m_count*2)) {
+			this.message = "month超过1年的计算范围";
+			return false;
+		}
+		//去年的情报
+		if (month < 1) {
+			year = year - 1;
+			month = month + m_count;
+		} else if(month > m_count) { //明年的情报
+			year = year + 1;
+			month = month - m_count;
+		}
+
+		this.datas = [];
+		var gr = null;
+		try {
+			gr = new GlideRecord(this.calendar_table);
+			gr.addQuery('year', year);
+			gr.addQuery('month', month);
+			gr.orderBy('date');
+			gr.query();
+			while(gr.next()) {
+				this.datas.push(gr.getValue("date"));
+			}
+
+		} catch(ex) {
+			this.message = ex.message;
+			return false;
+		} finally {
+			//释放内存
+			gr = null;
+		}
+		return true;
+	},
+
+    type: 'MyCalendar'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-25 08:10:54</sys_created_on>
+        <sys_id>e6c4dffc93470210868ab4de3bba10f4</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>MyCalendar</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_e6c4dffc93470210868ab4de3bba10f4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-25 09:59:03</sys_updated_on>
+    </sys_script_include>
+</record_update>

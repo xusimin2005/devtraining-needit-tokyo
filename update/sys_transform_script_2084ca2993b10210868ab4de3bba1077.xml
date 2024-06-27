@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_script">
+    <sys_transform_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <map display_value="A0 Transform">116c504993b18210868ab4de3bba1039</map>
+        <order>100</order>
+        <script><![CDATA[(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+
+	// Add your code here
+	//log.info('TransformScript start');
+	var gr = new GlideRecord('x_58872_needit_t1');
+	//gr.setLimit(1);
+	//gr.query();
+	//while (gr.next()) {
+	//	gr.deleteRecord();
+	//}
+	gr.setValue('set', import_set.number);
+	gr.setValue('memo', 'on start');
+	gr.insert();
+	//error = true;
+
+})(source, map, log, target);]]></script>
+        <sys_class_name>sys_transform_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-04-26 05:55:52</sys_created_on>
+        <sys_id>2084ca2993b10210868ab4de3bba1077</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>onStart</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_transform_script_2084ca2993b10210868ab4de3bba1077</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-04-29 06:17:48</sys_updated_on>
+        <when>onStart</when>
+    </sys_transform_script>
+</record_update>

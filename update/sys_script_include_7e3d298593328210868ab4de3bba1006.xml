@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.ExcelParser</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ExcelParser</name>
+        <script><![CDATA[var ExcelParser = Class.create();
+ExcelParser.prototype = {
+    initialize: function() {
+		this.datas = {};
+		this.message = "";
+    },
+
+	//解析PACKING LIST
+	parsePacking: function(attachmentId) {
+		//返回值
+		var ret = true;
+		var heads = {}; //返回表头数据
+		var details = []; //返回数据的数组
+		var totals = {}; //返回合计值
+
+		var parser = new sn_impex.GlideExcelParser();
+		var attachment = new GlideSysAttachment();
+		try {
+			// use attachment sys id of an excel file
+			var attachmentStream = attachment.getContentStream(attachmentId);
+
+			parser.parse(attachmentStream);
+
+			// retrieve the column headers
+			var columns = parser.getColumnHeaders();
+			var row = null;
+			// 定义特殊的行
+			var parkingListRow = 3;
+			var invoiceNoRow = 6;
+			var headRows = 28;
+			// 定义列的别称
+			var colTotal = columns[2];
+			var colItem = columns[3];
+			var colPackingList = columns[5];
+			var colInvoiceNo = columns[5];
+			var colQuantity = columns[5];
+			var colNW = columns[7];
+			var colGW = columns[8];
+			var colM3 = columns[9];
+
+			var currentRow = 2; //数据行从第二行开始
+			var invoiceNo = ""; //发票号码
+
+			//检查是否是PACKING LIST
+			while (parser.next()) {
+				if (currentRow == parkingListRow) {
+					row = parser.getRow();
+					var parking = row[colPackingList];
+					if (parking != "PACKING LIST") {
+						throw new Error("模板文件的F3单元格不是PACKING LIST");
+					} else {
+						currentRow++;
+						break;
+					}
+				}
+				//gs.info("row"+currentRow+"="+row[header1]);
+				currentRow++;
+			}
+
+			//获取明细数据
+			while (parser.next()) {
+				//获取发票号码
+				if (currentRow == invoiceNoRow) {
+					row = parser.getRow();
+					invoiceNo = row[colInvoiceNo];
+					heads["invoiceNo"] = invoiceNo;
+				}
+
+				//从headRows+1行开始取数据
+				if (currentRow > headRows) {
+					row = parser.getRow();
+					var item = row[colItem];
+					if (item == null || item.trim() == "") {
+						currentRow++;
+						break;
+					}
+					details.push({
+						"invoice_no": invoiceNo,
+						"item": item,
+						"quantity": parseInt(row[colQuantity]),
+						"n_w": parseFloat(row[colNW]),
+						"g_w": parseFloat(row[colGW]),
+						"m3": parseFloat(row[colM3])
+					});
+				}
+				currentRow++;
+			}
+
+			//获取Total数据
+			while (parser.next()) {
+				row = parser.getRow();
+				var totalTitle = row[colTotal];
+				if (totalTitle != null && totalTitle.trim().toUpperCase() == "TOTAL:") {
+					totals["total_quantity"] = parseInt(row[colQuantity]);
+					totals["total_n_w"] = parseFloat(row[colNW]);
+					totals["total_g_w"] = parseFloat(row[colGW]);
+					totals["total_m3"] = parseFloat(row[colM3]);
+
+					currentRow++;
+					break;
+				}
+				currentRow++;
+			}
+
+		} catch(ex) {
+			this.message = ex.message;
+			ret = false;
+		}
+		finally {
+			//释放内存
+			parser.close(); // close the stream and release the document
+		}
+
+		//设置返回值
+		this.datas["heads"] = heads;
+		this.datas["details"] = details;
+		this.datas["totals"] = totals;
+		return ret;
+	}, 
+
+    type: 'ExcelParser'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-13 07:55:21</sys_created_on>
+        <sys_id>7e3d298593328210868ab4de3bba1006</sys_id>
+        <sys_mod_count>27</sys_mod_count>
+        <sys_name>ExcelParser</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_7e3d298593328210868ab4de3bba1006</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-15 07:31:51</sys_updated_on>
+    </sys_script_include>
+</record_update>

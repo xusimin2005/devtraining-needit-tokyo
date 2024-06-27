@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.PackingListDb</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>PackingListDb</name>
+        <script><![CDATA[var PackingListDb = Class.create();
+PackingListDb.prototype = {
+    initialize: function() {
+		this.message = "";
+    },
+
+	_nvl: function(val) {
+		if (typeof val == "undefined" || val == null) {
+			return "NULL";
+		} else {
+			return val;
+		}
+	},
+
+	//保存Excel内容
+	saveExcelData: function(datas) {
+		var ret = true;
+
+		var gr_p1 = null;
+		var source_query = null;
+		var gr_insert = null;
+		try {
+			var heads = datas.heads; //表头数据
+			var details = datas.details; //明细数据的数组
+			var totals = datas.totals; //合计值
+
+			//检查P1表
+			var p_check_table = "x_58872_needit_p1";
+			var p_invoice_no = heads.invoiceNo;
+			var p_ref_invoice = "";
+			gr_p1 = new GlideRecord(p_check_table);
+			gr_p1.addQuery('invoice_no', p_invoice_no);
+			gr_p1.setLimit(1);
+			gr_p1.query();
+			if (gr_p1.next()) {
+				p_ref_invoice = gr_p1.sys_id;
+				gr_p1.setValue('total_quantity', this._nvl(totals.total_quantity));
+				gr_p1.setValue('total_n_w', this._nvl(totals.total_n_w));
+				gr_p1.setValue('total_g_w', this._nvl(totals.total_g_w));
+				gr_p1.setValue('total_m3', this._nvl(totals.total_m3));
+				gr_p1.update();
+			} else {
+				throw new Error("无发票数据, invoice_no=" + p_invoice_no);
+			}
+
+			//设定P0表
+			if (details.length > 0) {
+				var p_target_table = "x_58872_needit_p0";
+				//删除老的invoice_no数据
+				source_query = new global.GlideQuery(p_target_table)
+					.where('invoice_no', p_ref_invoice)
+					.deleteMultiple();
+				//追加新的记录
+				var i = 0;
+				var record_data = null;
+				var items = ['item', 'quantity', 'n_w', 'g_w', 'm3'];
+				gr_insert = new GlideRecordSecure(p_target_table);
+				try {
+					for (; i < details.length; i++) {
+						gr_insert.initialize();
+						record_data = details[i];
+						gr_insert.setValue('invoice_no', p_ref_invoice);
+						for (var j = 0; j <  items.length; j++) {
+							var item =  items[j];
+							gr_insert.setValue(item, this._nvl(record_data[item]));
+						}
+						gr_insert.insert();
+					}
+				} catch(err) {
+					throw new Error("保存第"+(i+1)+"条明细时报错, "+err.message);
+				}
+			} else {
+				throw new Error("未取到明细数据");
+			}
+		} catch(ex) {
+			this.message = ex.message;
+			ret = false;
+		}
+		finally {
+			//释放内存
+			gr_p1 = null;
+			source_query = null;
+			gr_insert = null;
+		}
+		
+		return ret;
+	},
+
+    type: 'PackingListDb'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-15 03:43:42</sys_created_on>
+        <sys_id>3f4783e993b20210868ab4de3bba109a</sys_id>
+        <sys_mod_count>15</sys_mod_count>
+        <sys_name>PackingListDb</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_3f4783e993b20210868ab4de3bba109a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-15 11:54:56</sys_updated_on>
+    </sys_script_include>
+</record_update>

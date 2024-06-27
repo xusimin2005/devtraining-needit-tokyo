@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_pd_trigger_definition">
+    <sys_pd_trigger_definition action="DELETE">
+        <active>true</active>
+        <description/>
+        <label>UpdateAttachmentFlag</label>
+        <name>updateattachmentflag</name>
+        <short_description/>
+        <sys_class_name>sys_pd_trigger_definition</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-24 01:47:35</sys_created_on>
+        <sys_id>6b03c12c93030210868ab4de3bba1055</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>UpdateAttachmentFlag</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_pd_trigger_definition_6b03c12c93030210868ab4de3bba1055</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-24 01:47:35</sys_updated_on>
+        <trigger_inputs/>
+        <trigger_type display_value="Record Create or Update">789911170f1200108c87f4f0ff767e27</trigger_type>
+    </sys_pd_trigger_definition>
+    <sys_variable_value action="DELETE" query="document_key=6b03c12c93030210868ab4de3bba1055"/>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>38594d971b4a7dd039a54089bd4bcb9f</instance_id>
+        <instance_name>dev196248</instance_name>
+        <name>sys_pd_trigger_definition_6b03c12c93030210868ab4de3bba1055</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_pd_trigger_definition"><sys_pd_trigger_definition action="INSERT_OR_UPDATE"><active>true</active><description/><label>UpdateAttachmentFlag</label><name>updateattachmentflag</name><short_description/><sys_class_name>sys_pd_trigger_definition</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2024-06-24 01:47:35</sys_created_on><sys_id>6b03c12c93030210868ab4de3bba1055</sys_id><sys_mod_count>0</sys_mod_count><sys_name>UpdateAttachmentFlag</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>sys_pd_trigger_definition_6b03c12c93030210868ab4de3bba1055</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2024-06-24 01:47:35</sys_updated_on><trigger_inputs/><trigger_type display_value="Record Create or Update">789911170f1200108c87f4f0ff767e27</trigger_type></sys_pd_trigger_definition><sys_variable_value action="delete_multiple" query="document_key=6b03c12c93030210868ab4de3bba1055"/></record_update>]]></payload>
+        <payload_hash>340082434</payload_hash>
+        <record_name>UpdateAttachmentFlag</record_name>
+        <reverted_from/>
+        <source>af21a82093b84210868ab4de3bba101c</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-24 01:47:35</sys_created_on>
+        <sys_id>4763052c93030210868ab4de3bba10db</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>19047ed5aa80000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-24 01:47:35</sys_updated_on>
+        <type>Trigger Definition</type>
+        <update_guid>0b63052cf2030210e702145ed53381da</update_guid>
+        <update_guid_history>0b63052cf2030210e702145ed53381da:340082434</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-24 01:50:03</sys_created_on>
+        <sys_db_object display_value="" name="sys_pd_trigger_definition">sys_pd_trigger_definition</sys_db_object>
+        <sys_id>07afb90653094c28848f23ec2ab8b240</sys_id>
+        <sys_metadata>6b03c12c93030210868ab4de3bba1055</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>UpdateAttachmentFlag</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sys_pd_trigger_definition_6b03c12c93030210868ab4de3bba1055</sys_update_name>
+        <sys_update_version display_value="sys_pd_trigger_definition_6b03c12c93030210868ab4de3bba1055">4763052c93030210868ab4de3bba10db</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-24 01:50:03</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

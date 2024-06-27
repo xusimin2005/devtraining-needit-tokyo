@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.GetCalendar</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>GetCalendar</name>
+        <script><![CDATA[var GetCalendar = Class.create();
+GetCalendar.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+	//获取这星期的日历
+	getThisWeek: function() {
+		//返回值
+		var response = {};
+		var result = ""; //执行结果ok，ng或者err
+		var message = ""; //ng或者err的时候设置异常原因
+		//自定义的返回值
+		var datas = null;
+		var ret = false;
+
+		var calendar = new x_58872_needit.MyCalendar();
+		var today = calendar.getToday();
+		ret = calendar.getWeek(today.year, today.week_of_year);
+		if (!ret) {
+			result = "ng";
+			message = calendar.message;
+		} else {
+			result = "ok";
+			datas = calendar.datas;
+		}
+		response["result"] = result;
+		response["message"] = message;
+		response["datas"] = datas;
+		return(JSON.stringify(response));
+	},
+
+	//获取这星期和下星期的日历
+	getThisNextWeek: function() {
+		//返回值
+		var response = {};
+		var result = ""; //执行结果ok，ng或者err
+		var message = ""; //ng或者err的时候设置异常原因
+		//自定义的返回值
+		var datas = null;
+		var ret = false;
+
+		var calendar = new x_58872_needit.MyCalendar();
+		var today = calendar.getToday();
+
+		//获取下星期数据
+		var thisWeek = null;
+		ret = calendar.getWeek(today.year, today.week_of_year);
+		if (ret) {
+			thisWeek = calendar.datas;
+		}
+
+		//获取这星期数据
+		var nextWeek = null;
+		if (ret) {
+			ret = calendar.getWeek(today.year, today.week_of_year+1);
+			if (ret) {
+				nextWeek = calendar.datas;
+			}
+		}
+
+		if (!ret) {
+			result = "ng";
+			message = calendar.message;
+		} else {
+			result = "ok";
+			datas = thisWeek.concat(nextWeek);
+		}
+		response["result"] = result;
+		response["message"] = message;
+		response["datas"] = datas;
+		return(JSON.stringify(response));
+	},
+
+	//获取这月的日历
+	getThisMonth: function() {
+		//返回值
+		var response = {};
+		var result = ""; //执行结果ok，ng或者err
+		var message = ""; //ng或者err的时候设置异常原因
+		//自定义的返回值
+		var datas = null;
+		var ret = false;
+
+		var calendar = new x_58872_needit.MyCalendar();
+		var today = calendar.getToday();
+		ret = calendar.getMonth(today.year, today.month);
+		if (!ret) {
+			result = "ng";
+			message = calendar.message;
+		} else {
+			result = "ok";
+			datas = calendar.datas;
+		}
+		response["result"] = result;
+		response["message"] = message;
+		response["datas"] = datas;
+		return(JSON.stringify(response));
+	},
+
+    type: 'GetCalendar'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-25 09:06:42</sys_created_on>
+        <sys_id>e116273893870210868ab4de3bba1082</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>GetCalendar</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_e116273893870210868ab4de3bba1082</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-25 10:01:47</sys_updated_on>
+    </sys_script_include>
+</record_update>

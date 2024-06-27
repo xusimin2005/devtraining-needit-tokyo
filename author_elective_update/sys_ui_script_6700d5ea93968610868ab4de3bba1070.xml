@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="DELETE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_58872_needit.utility</name>
+        <script><![CDATA[var x_58872_needit = x_58872_needit || {};
+
+x_58872_needit.utility = (function() {
+	//"use strict";
+
+/* set your private variables and functions here. For example: 
+	var privateVar = 0; 
+	function private_function() {
+		return ++privateVar;
+	}
+*/
+
+/* Share variables between multiple UI scripts by adding them to your scope object. For example: 
+	x_58872_needit.sharedVar = 0; 
+
+ Then access them in your scripts the same way. For example: 
+	function get_shared() {
+		return x_58872_needit.sharedVar;
+	}
+*/
+
+	return {
+
+/* set your public API here. For example:
+		incrementAndReturnPrivateVar: function() {
+			return private_function();
+		},
+*/
+		toString: function(obj) {
+			if (obj == null) {
+				return null;
+			} else {
+				return obj.toString();
+			}
+		},
+		toNumber: function(obj) {
+			if (obj == null || obj == "") {
+				return null;
+			} else {
+				return Number(obj);
+			}
+		},
+		typeTransform: function(obj, item, type) {
+			var itemValue = obj[item];
+			if (typeof itemValue == "undefined" || itemValue == null) {
+				return;
+			}
+			if (type == "number") {
+				obj[item] = itemValue=="" ? null : Number(itemValue);
+			} else {
+				obj[item] = itemValue.toString();
+			}
+		},
+		
+		type:  "utility"
+	};
+})();
+]]></script>
+        <script_name>utility</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-05-24 01:14:12</sys_created_on>
+        <sys_id>6700d5ea93968610868ab4de3bba1070</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>x_58872_needit.utility</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_script_6700d5ea93968610868ab4de3bba1070</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-05-24 01:44:43</sys_updated_on>
+        <ui_type>10</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>38594d971b4a7dd039a54089bd4bcb9f</instance_id>
+        <instance_name>dev196248</instance_name>
+        <name>sys_ui_script_6700d5ea93968610868ab4de3bba1070</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_ui_script"&gt;&lt;sys_ui_script action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;description/&gt;&lt;global&gt;false&lt;/global&gt;&lt;ignore_in_now_experience&gt;false&lt;/ignore_in_now_experience&gt;&lt;name&gt;x_58872_needit.utility&lt;/name&gt;&lt;script&gt;&lt;![CDATA[var x_58872_needit = x_58872_needit || {};
+
+x_58872_needit.utility = (function() {
+	//"use strict";
+
+/* set your private variables and functions here. For example: 
+	var privateVar = 0; 
+	function private_function() {
+		return ++privateVar;
+	}
+*/
+
+/* Share variables between multiple UI scripts by adding them to your scope object. For example: 
+	x_58872_needit.sharedVar = 0; 
+
+ Then access them in your scripts the same way. For example: 
+	function get_shared() {
+		return x_58872_needit.sharedVar;
+	}
+*/
+
+	return {
+
+/* set your public API here. For example:
+		incrementAndReturnPrivateVar: function() {
+			return private_function();
+		},
+*/
+		toString: function(obj) {
+			if (obj == null) {
+				return null;
+			} else {
+				return obj.toString();
+			}
+		},
+		toNumber: function(obj) {
+			if (obj == null || obj == "") {
+				return null;
+			} else {
+				return Number(obj);
+			}
+		},
+		typeTransform: function(obj, item, type) {
+			var itemValue = obj[item];
+			if (typeof itemValue == "undefined" || itemValue == null) {
+				return;
+			}
+			if (type == "number") {
+				obj[item] = itemValue=="" ? null : Number(itemValue);
+			} else {
+				obj[item] = itemValue.toString();
+			}
+		},
+		
+		type:  "utility"
+	};
+})();
+]]&gt;&lt;/script&gt;&lt;script_name&gt;utility&lt;/script_name&gt;&lt;sys_class_name&gt;sys_ui_script&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2024-05-24 01:14:12&lt;/sys_created_on&gt;&lt;sys_id&gt;6700d5ea93968610868ab4de3bba1070&lt;/sys_id&gt;&lt;sys_mod_count&gt;1&lt;/sys_mod_count&gt;&lt;sys_name&gt;x_58872_needit.utility&lt;/sys_name&gt;&lt;sys_package display_value="NeedIt" source="x_58872_needit"&gt;6ead8e780f603200cd674f8ce1050ed1&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="NeedIt"&gt;6ead8e780f603200cd674f8ce1050ed1&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_ui_script_6700d5ea93968610868ab4de3bba1070&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2024-05-24 01:44:43&lt;/sys_updated_on&gt;&lt;ui_type&gt;10&lt;/ui_type&gt;&lt;use_scoped_format&gt;false&lt;/use_scoped_format&gt;&lt;/sys_ui_script&gt;&lt;/record_update&gt;</payload>
+        <payload_hash>539841320</payload_hash>
+        <record_name>x_58872_needit.utility</record_name>
+        <reverted_from/>
+        <source>af21a82093b84210868ab4de3bba101c</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-05-24 01:44:43</sys_created_on>
+        <sys_id>b679d96a93d68610868ab4de3bba1044</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>18fa84596c80000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-05-24 01:44:43</sys_updated_on>
+        <type>UI Script</type>
+        <update_guid>7a79d96a6ad6861056d7473c3b0b8d43</update_guid>
+        <update_guid_history>7a79d96a6ad6861056d7473c3b0b8d43:539841320,f77299ea01968610caa9f487ffa27b89:442392541</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-05-24 01:47:03</sys_created_on>
+        <sys_db_object display_value="" name="sys_ui_script">sys_ui_script</sys_db_object>
+        <sys_id>1909bfb64e0e4ea89ed6f7706cd83984</sys_id>
+        <sys_metadata>6700d5ea93968610868ab4de3bba1070</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_58872_needit.utility</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sys_ui_script_6700d5ea93968610868ab4de3bba1070</sys_update_name>
+        <sys_update_version display_value="sys_ui_script_6700d5ea93968610868ab4de3bba1070">b679d96a93d68610868ab4de3bba1044</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-05-24 01:47:03</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

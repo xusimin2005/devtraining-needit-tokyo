@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.CollectPsiChange</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>CollectPsiChange</name>
+        <script><![CDATA[var _setAoRecord = function(insertOrUpdate, target, source, 
+							source_table_name) {
+	target.setValue('year', source.cal_year);
+	target.setValue('active_s', source.active);
+	//无效时清空设定的值
+	if (!source.active) {
+		source.u_m1 = '';
+		source.u_m2 = '';
+		source.u_m3 = '';
+	}
+	switch(source.cal_month) {
+	case 1:
+		//取当前数据
+		target.setValue('s4', source.u_m1);
+		target.setValue('s5', source.u_m2);
+		target.setValue('s6', source.u_m3);
+		target.setValue('s7', '');
+		target.setValue('s3', '');
+		break;
+	case 2:
+		//取履历
+		if (insertOrUpdate === 'i') {
+			var queryHis = new global.GlideQuery(source_table_name)
+				.where('u_ver', '=', source.cal_year.toString() + '04')
+				.where('company', '=', source.company)
+				.where('item', '=', source.item)
+				.select('u_m1')
+				.forEach(function(history) {
+					target.setValue('s4', history.u_m1);
+				});
+			queryHis = null;
+		}
+		//取当前数据
+		target.setValue('s5', source.u_m1);
+		target.setValue('s6', source.u_m2);
+		target.setValue('s7', source.u_m3);
+		target.setValue('s3', '');
+		break;
+	}
+};
+
+var CollectPsiChange = Class.create();
+CollectPsiChange.prototype = {
+    initialize: function() {
+    },
+
+	collect: function(type) {
+		var my_job = 'Auto Fetch Change: ';
+		var now = new GlideDateTime();
+		var def_fetch_time = new GlideDateTime('1970-01-01 00:00:00');
+		var fetch_table_name = 'x_58872_needit_fetch_data_time';
+		var target_table_name = 'x_58872_needit_u0';
+
+		var has_source_last_time = false;
+		var source_table_name = '';
+		var fetch_job_name = '';
+		var source_last_time = null;
+
+		var gr_update_fetch_time = null;
+		var gr_insert_fetch_time = null;
+		var source_max_time = null;
+		var source_query = null;
+
+		// 开始处理A0表的更新
+		gs.info(my_job + 'fetch a0 update start');
+
+		source_table_name = 'x_58872_needit_a0';
+		fetch_job_name = 'fetch_a0_change';
+		//获取当前记录的最后更新时间
+		source_max_time = new global.GlideQuery(source_table_name)
+			.max('sys_updated_on')
+			.orElse(def_fetch_time);
+		//获取记录的上次抽取时间
+		gr_update_fetch_time = new GlideRecord(fetch_table_name);
+		gr_update_fetch_time.addQuery('job_id', fetch_job_name);
+		gr_update_fetch_time.addQuery('active', true);
+		gr_update_fetch_time.query();
+		//存在前次抽取数据的时间
+		if (gr_update_fetch_time.next()) {
+			has_source_last_time = true;
+			source_last_time = gr_update_fetch_time.max_time;
+		} else {
+			has_source_last_time = false;
+			source_last_time = def_fetch_time;
+		}
+		//获取原表的更新记录一览
+		source_query = new global.GlideQuery(source_table_name)
+			.where('sys_updated_on', '>=', source_last_time)
+			.where('sys_updated_on', '<=', source_max_time)
+			.select('u_ver', 'company', 'item', 'cal_year', 'active', 'cal_month', 
+				'sys_created_on', 'sys_updated_on', 'u_m1', 'u_m2', 'u_m3')
+			.forEach(function(source) {
+				var insertOrUpdate = source.sys_created_on == source.sys_updated_on ? 'i' : 'u';
+				var gr_update_target = new GlideRecord(target_table_name);
+				gr_update_target.addQuery('ver', source.u_ver);
+				gr_update_target.addQuery('company', source.company);
+				gr_update_target.addQuery('item', source.item);
+				gr_update_target.query();
+				if (gr_update_target.next()) {
+					//gr_update_target.setValue('year', source.cal_year);
+					//gr_update_target.setValue('active_s', source.active);
+					//gr_update_target.setValue('s4', source.u_m4);
+					//gr_update_target.setValue('s5', source.u_m5);
+					//gr_update_target.setValue('s6', source.u_m6);
+					_setAoRecord(insertOrUpdate, gr_update_target, source, 
+						source_table_name);
+					gr_update_target.update();
+				} else {
+					var gr_insert_target = new GlideRecord(target_table_name);
+					gr_insert_target.setValue('ver', source.u_ver);
+					gr_insert_target.setValue('company', source.company);
+					gr_insert_target.setValue('item', source.item);
+					//gr_insert_target.setValue('year', source.cal_year);
+					//gr_insert_target.setValue('active_s', source.active);
+					//gr_insert_target.setValue('s4', source.u_m4);
+					//gr_insert_target.setValue('s5', source.u_m5);
+					//gr_insert_target.setValue('s6', source.u_m6);
+					_setAoRecord(insertOrUpdate, gr_insert_target, source, 
+						source_table_name);
+					gr_insert_target.insert();
+					//释放内存
+					gr_insert_target = null;
+				}
+				//释放内存
+				gr_update_target = null;
+
+				//如果当前数据为更新，则把当前版本的第一个月数据向后更新到目标表的其他版本
+				if (insertOrUpdate === 'u') {
+					var targetMonth = source.cal_month >= 10 ? 
+						(source.cal_month - 9).toString() : (source.cal_month + 3).toString();
+					targetMonth = 's' + targetMonth;
+					gr_update_target = new GlideRecord(target_table_name);
+					gr_update_target.addQuery('ver', '>', source.u_ver);
+					gr_update_target.addQuery('company', source.company);
+					gr_update_target.addQuery('item', source.item);
+					gr_update_target.query();
+					while (gr_update_target.next()) {
+						gr_update_target.setValue(targetMonth, source.u_m1);
+						gr_update_target.update();
+					}
+					//释放内存
+					gr_update_target = null;
+				}
+			});
+
+		//更新老的抽取履历
+		if (has_source_last_time) {
+			gr_update_fetch_time.setValue('active', false);
+			gr_update_fetch_time.update();
+		}
+		//做成新的抽取履历
+		gr_insert_fetch_time = new GlideRecord(fetch_table_name);
+		gr_insert_fetch_time.setValue('job_id', fetch_job_name);
+		gr_insert_fetch_time.setValue('fetch_time', now);
+		gr_insert_fetch_time.setValue('max_time', source_max_time);
+		gr_insert_fetch_time.insert();
+
+		//释放内存
+		gr_update_fetch_time = null;
+		gr_insert_fetch_time = null;
+		source_max_time = null;
+		source_query = null;
+
+		// A0表的更新处理结束
+		gs.info(my_job + 'fetch a0 update end');
+
+		// 开始处理B0表的更新
+		gs.info(my_job + 'fetch b0 update start');
+
+		source_table_name = 'x_58872_needit_b0';
+		fetch_job_name = 'fetch_b0_change';
+		//获取当前记录的最后更新时间
+		source_max_time = new global.GlideQuery(source_table_name)
+			.max('sys_updated_on')
+			.orElse(def_fetch_time);
+		//获取记录的上次抽取时间
+		gr_update_fetch_time = new GlideRecord(fetch_table_name);
+		gr_update_fetch_time.addQuery('job_id', fetch_job_name);
+		gr_update_fetch_time.addQuery('active', true);
+		gr_update_fetch_time.query();
+		//存在前次抽取数据的时间
+		if (gr_update_fetch_time.next()) {
+			has_source_last_time = true;
+			source_last_time = gr_update_fetch_time.max_time;
+		} else {
+			has_source_last_time = false;
+			source_last_time = def_fetch_time;
+		}
+		//获取原表的更新记录一览
+		source_query = new global.GlideQuery(source_table_name)
+			.where('sys_updated_on', '>=', source_last_time)
+			.where('sys_updated_on', '<=', source_max_time)
+			.select('company', 'item', 'year', 'active', 'v3', 'v4', 
+				'v5', 'v6')
+			.forEach(function(source) {
+				//针对每条记录循环12次对应12个月的版本号，预算内容一致
+				for (var i = 4; i < 16; i++) {
+					var cal_ver = '';
+					if (i <= 12) {
+						cal_ver = source.year.toString() + i.toString().padStart(2, '0');
+					} else {
+						cal_ver = (source.year + 1).toString() + (i - 12).toString().padStart(2, '0');
+					}
+					//无效时清空设定的值
+					if (!source.active) {
+						source.v3 = '';
+						source.v4 = '';
+						source.v5 = '';
+						source.v6 = '';
+					}
+					var gr_update_target = new GlideRecord(target_table_name);
+					gr_update_target.addQuery('ver', cal_ver);
+					gr_update_target.addQuery('company', source.company);
+					gr_update_target.addQuery('item', source.item);
+					gr_update_target.query();
+					if (gr_update_target.next()) {
+						gr_update_target.setValue('year', source.year);
+						gr_update_target.setValue('active_p', source.active);
+						gr_update_target.setValue('p4', source.v4);
+						gr_update_target.setValue('p5', source.v5);
+						gr_update_target.setValue('p6', source.v6);
+						gr_update_target.update();
+					} else {
+						var gr_insert_target = new GlideRecord(target_table_name);
+						gr_insert_target.setValue('ver', cal_ver);
+						gr_insert_target.setValue('company', source.company);
+						gr_insert_target.setValue('item', source.item);
+						gr_insert_target.setValue('year', source.year);
+						gr_insert_target.setValue('active_p', source.active);
+						gr_insert_target.setValue('p4', source.v4);
+						gr_insert_target.setValue('p5', source.v5);
+						gr_insert_target.setValue('p6', source.v6);
+						gr_insert_target.insert();
+						//释放内存
+						gr_insert_target = null;
+					}
+					//释放内存
+					gr_update_target = null;
+				}
+				//释放内存
+				source = null;
+			});
+
+		//更新老的抽取履历
+		if (has_source_last_time) {
+			gr_update_fetch_time.setValue('active', false);
+			gr_update_fetch_time.update();
+		}
+		//做成新的抽取履历
+		gr_insert_fetch_time = new GlideRecord(fetch_table_name);
+		gr_insert_fetch_time.setValue('job_id', fetch_job_name);
+		gr_insert_fetch_time.setValue('fetch_time', now);
+		gr_insert_fetch_time.setValue('max_time', source_max_time);
+		gr_insert_fetch_time.insert();
+
+		//释放内存
+		gr_update_fetch_time = null;
+		gr_insert_fetch_time = null;
+		source_max_time = null;
+		source_query = null;
+
+		// A0表的更新处理结束
+		gs.info(my_job + 'fetch b0 update end');
+
+	},
+
+    type: 'CollectPsiChange'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-05-08 08:36:24</sys_created_on>
+        <sys_id>7bbd1c2993428610868ab4de3bba1078</sys_id>
+        <sys_mod_count>18</sys_mod_count>
+        <sys_name>CollectPsiChange</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_7bbd1c2993428610868ab4de3bba1078</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-05-10 02:02:18</sys_updated_on>
+    </sys_script_include>
+</record_update>

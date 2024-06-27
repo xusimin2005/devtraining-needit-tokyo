@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.RefreshPackingList</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>RefreshPackingList</name>
+        <script><![CDATA[var RefreshPackingList = Class.create();
+RefreshPackingList.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+	refresh: function() {
+		//返回值
+		var response = {};
+		var result = ""; //执行结果ok，ng或者err
+		var message = ""; //ng或者err的时候设置异常原因
+		//自定义的返回值
+		var ret = true;
+		var attachment_id = "";
+		var datas = {};
+		
+		//检索条件
+		var p_table_name = "x_58872_needit_p1";
+		var p_record_id = this.getParameter("sysparm_record_id");
+		var p_invoice_no = this.getParameter("sysparm_invoice_no");
+		gs.info("RefreshPackingList: " +
+			", p_record_id=" + p_record_id +
+			", p_invoice_no=" + p_invoice_no);
+
+		//取得附件AttachmentId
+		var attachment = new x_58872_needit.AttachmentId(p_table_name);
+		ret = attachment.getByRecordId(p_record_id);
+		if (!ret) {
+			result = "ng";
+			message = attachment.message;
+		} else {
+			attachment_id = attachment.id;
+			gs.info("RefreshPackingList: " +
+				", attachment_id=" + attachment_id);
+		}
+		
+		//根据AttachmentId，取得附件内容
+		if (ret) {
+			var excel = new x_58872_needit.ExcelParser();
+			ret = excel.parsePacking(attachment_id);
+			if (ret) {
+				datas = excel.datas;
+
+				//检查发票号码是否一致
+				var invoice_no = datas.heads.invoiceNo;
+				gs.info("RefreshPackingList: " +
+					", invoiceNo=" + invoice_no);
+				if (invoice_no != p_invoice_no) {
+					ret = false;
+					result = "ng";
+					if (message.length > 0) {
+						message = message + ", ";
+					}
+					message = message + "附件的发票号"+invoice_no+"与当前记录的发票号不一致";
+				}
+
+				//检查是否包含明细数据
+				var detailCount = datas.details.length;
+				gs.info("RefreshPackingList: " +
+					", detailCount=" + detailCount);
+				if (detailCount == 0) {
+					ret = false;
+					result = "ng";
+					if (message.length > 0) {
+						message = message + ", ";
+					}
+					message = message + "附件中没有明细数据";
+					
+				}
+
+				//检查没有问题后保存数据
+				if (ret) {
+					response["datas"] = datas;
+				}
+
+			} else {
+				result = "ng";
+				message = excel.message;
+			}
+		}
+
+		//根据附件内容，保存PackingList
+		if (ret) {
+			var db = new x_58872_needit.PackingListDb();
+			ret = db.saveExcelData(datas);
+			if (!ret) {
+				result = "ng";
+				message = db.message;
+			}
+		}
+
+		//所有处理都ok的场合
+		if (ret) {
+			result = "ok";
+		}
+		response["result"] = result;
+		response["message"] = message;
+		return(JSON.stringify(response));
+	},
+
+    type: 'RefreshPackingList'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-14 09:03:04</sys_created_on>
+        <sys_id>a9e6cf9d93760210868ab4de3bba1040</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>RefreshPackingList</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_a9e6cf9d93760210868ab4de3bba1040</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-15 06:22:24</sys_updated_on>
+    </sys_script_include>
+</record_update>

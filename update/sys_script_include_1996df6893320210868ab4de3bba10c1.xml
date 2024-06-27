@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_58872_needit.GetPackingData</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>GetPackingData</name>
+        <script><![CDATA[var GetPackingData = Class.create();
+GetPackingData.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
+	getByInvoiceNo: function() {
+		//返回值
+		var response = {};
+		var result = ""; //执行结果ok，ng或者err
+		var message = ""; //ng或者err的时候设置异常原因
+		
+		var records = []; //返回数据的数组
+		var totals = {}; //返回合计值
+		
+		//检索条件
+		var p_invoice_no = this.getParameter("sysparm_invoice_no");
+		var p_target_table = "x_58872_needit_p0";
+		var source_query = null;
+		try {
+			//检索invoice_no数据
+			source_query = new global.GlideQuery(p_target_table)
+				.where('invoice_no.invoice_no', p_invoice_no)
+				.select('item', 'quantity', 'n_w', 'g_w', 'm3')
+				.forEach(function(source) {
+					records.push({
+						'Item': source.item,
+						'Quantity': source.quantity,
+						'N/W': source.n_w,
+						'G/W': source.g_w,
+						'M3': source.m3
+					});
+				});
+			response["records"] = records;
+		} catch(ex) {
+			message = ex.message;
+			result = "err";
+		}
+		finally {
+			//释放内存
+			source_query = null;
+		}
+
+		p_target_table = "x_58872_needit_p1";
+		var total_query = null;
+		try {
+			//检索total数据
+			total_query = new global.GlideQuery(p_target_table)
+				.where('invoice_no', p_invoice_no)
+				.limit(1)
+				.select('total_quantity', 'total_g_w', 'total_n_w', 'total_m3')
+				.forEach(function(source) {
+					totals["Quantity"] = source.total_quantity;
+					totals["N/W"] = source.total_n_w;
+					totals["G/W"] = source.total_g_w;
+					totals["M3"] = source.total_m3;
+				});
+			response["totals"] = totals;
+		} catch(ex) {
+			message = ex.message;
+			result = "err";
+		}
+		finally {
+			//释放内存
+			total_query = null;
+		}
+
+		//未设定结果的场合
+		if (result == "") {
+			if (records.length == 0) {
+				message = "没有数据";
+				result = "ng";
+			} else {
+				result = "ok";
+			}
+		}
+		//设置返回值
+		response["result"] = result;
+		response["message"] = message;
+		return(JSON.stringify(response));
+	},
+
+    type: 'GetPackingData'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-12 02:16:14</sys_created_on>
+        <sys_id>1996df6893320210868ab4de3bba10c1</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>GetPackingData</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_include_1996df6893320210868ab4de3bba10c1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-13 05:16:53</sys_updated_on>
+    </sys_script_include>
+</record_update>
