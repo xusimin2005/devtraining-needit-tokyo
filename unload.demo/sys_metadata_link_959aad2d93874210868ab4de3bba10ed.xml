@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>unload.demo</directory>
+        <documentkey>a57d8ff893470210868ab4de3bba1031</documentkey>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="x_58872_needit_c0">
+    <x_58872_needit_c0 action="INSERT_OR_UPDATE">
+        <date>2026-02-03</date>
+        <day_of_week>2</day_of_week>
+        <month>2</month>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-25 06:29:10</sys_created_on>
+        <sys_id>a57d8ff893470210868ab4de3bba1031</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-25 06:29:10</sys_updated_on>
+        <week_of_year>6</week_of_year>
+        <year>2026</year>
+    </x_58872_needit_c0>
+</record_update>
+]]></payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-27 07:12:36</sys_created_on>
+        <sys_id>959aad2d93874210868ab4de3bba10ed</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Created 2024-06-25 14:29:10</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_metadata_link_959aad2d93874210868ab4de3bba10ed</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-27 07:12:36</sys_updated_on>
+        <tablename>x_58872_needit_c0</tablename>
+    </sys_metadata_link>
+</record_update>

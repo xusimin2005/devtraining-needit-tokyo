@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>update</directory>
+        <documentkey>ef3b437893470210868ab4de3bba1019</documentkey>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="x_58872_needit_c0">
+    <x_58872_needit_c0 action="INSERT_OR_UPDATE">
+        <date>2025-01-13</date>
+        <day_of_week>1</day_of_week>
+        <month>1</month>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-25 06:19:29</sys_created_on>
+        <sys_id>ef3b437893470210868ab4de3bba1019</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-25 06:19:29</sys_updated_on>
+        <week_of_year>3</week_of_year>
+        <year>2025</year>
+    </x_58872_needit_c0>
+</record_update>
+]]></payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-06-27 07:11:27</sys_created_on>
+        <sys_id>5c5ae9e993874210868ab4de3bba1098</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Created 2024-06-25 14:19:29</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_metadata_link_5c5ae9e993874210868ab4de3bba1098</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-06-27 07:11:27</sys_updated_on>
+        <tablename>x_58872_needit_c0</tablename>
+    </sys_metadata_link>
+</record_update>
