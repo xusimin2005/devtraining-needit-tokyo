@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_58872_needit.ExcelUtility</name>
+        <script><![CDATA[var x_58872_needit = x_58872_needit || {};
+
+// 需要引入Excel解析的外部js(exceljs)
+x_58872_needit.ExcelUtility = (function() {
+	"use strict";
+
+/* set your private variables and functions here. For example: 
+	var privateVar = 0; 
+	function private_function() {
+		return ++privateVar;
+	}
+*/
+	//把字段名转换成符合db规则的名称
+	function toDbColumnName(colName) {
+		return "u_" + colName.toLowerCase().replaceAll(" ", "_");
+	}
+
+	//把字段名转换成符合展示规则的名称
+	function toDisplayColumnName(colName) {
+		var v = null;
+		var head = colName.slice(0, 2);
+		//去除开头的u_
+		if (head == "u_") {
+			v = colName.slice(2);
+		} else {
+			v = colName;
+		}
+		//首字母大写
+		v = v.slice(0, 1).toUpperCase() + v.slice(1);
+		return v.replaceAll("_", " ");
+	}
+
+	function dateToString(obj) {
+		if (obj) {
+			if (typeof obj == "string") {
+				return obj;
+			} else {
+				try {
+					var Y = obj.getFullYear();
+					var M = obj.getMonth() + 1;
+					var D = obj.getDate();
+					return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
+				} catch(ex) {
+					return obj.toString();
+				}
+			}
+		} else {
+			return '';
+		}
+	}
+
+	function transformString(obj) {
+		var objType = typeof obj;
+		if (obj === null || obj === "" || objType === "undefined") {
+			return "";
+		} else if (objType === "string") {
+			return obj;
+		} else if (objType === "object") {
+			if ("richText" in obj) {
+				var richText = obj.richText;
+				var buff = "";
+				for (var i = 0; i < richText.length; i++) {
+					buff = buff + richText[i]["text"];
+				}
+				return buff;
+			} else {
+				return dateToString(obj);
+			}
+		} else {
+			return obj.toString();
+		}
+	}
+
+	function getCellValue(cell, type) {
+		if (type === "string") {
+			return cell.text;
+		} else if (type === "number") {
+			return cell.value;
+		} else if (type === "date") {
+			return dateToString(cell.value);
+		} else {
+			return transformString(cell.value);
+		}
+	}
+
+	// getLocalFile函数：通过FileReader读取本地文件并返回结果给Promise
+	function getLocalFile(fileObj) {
+		return new Promise(function(resolve, reject) {
+			var reader = new FileReader();
+			reader.filename = fileObj.name;
+			reader.filetype = fileObj.type;
+			reader.onloadend = function(e) {
+				resolve(e.target);
+			};
+			reader.onerror = function(e) {
+				reject(e.target);
+			};
+			reader.readAsArrayBuffer(fileObj);
+		});
+	}
+
+/* Share variables between multiple UI scripts by adding them to your scope object. For example: 
+	x_58872_needit.sharedVar = 0; 
+
+ Then access them in your scripts the same way. For example: 
+	function get_shared() {
+		return x_58872_needit.sharedVar;
+	}
+*/
+
+	return {
+
+/* set your public API here. For example:
+		incrementAndReturnPrivateVar: function() {
+			return private_function();
+		},
+*/
+		//打开本地Excel文件
+		getLocalExcel: function (fileObj) {
+			return getLocalFile(fileObj).then(function(reader) {
+				return new Promise(function(resolve, reject) {
+					var workbook = new ExcelJS.Workbook();
+					workbook.xlsx.load(reader.result).then(function() {
+						resolve(workbook);
+					}).catch(function(error) {
+						workbook = null;
+						reject(error.message);
+					}); //end of workbook.xlsx.load
+
+				}); //end of new Promise
+
+			}); //end of getLocalFile
+		}, 
+
+		//解析Excel文件
+		//isToDbColumnName: 是否把title行的列名转换成db名
+		//sheetNo: sheet的序号，从1开始
+		//hasHead: 是否有title行
+		//headRowNo: title行的序号，从1开始
+		parseNormalExcel: function(fileObj, isToDbColumnName, sheetNo, hasHead, headRowNo) {
+			if (typeof isToDbColumnName == "undefined") {
+				isToDbColumnName = false;
+			}
+			if (typeof sheetNo == "undefined") {
+				sheetNo = 1;
+			}
+			if (typeof hasHead == "undefined") {
+				hasHead = true;
+			}
+			if (!hasHead) {
+				headRowNo = 0;
+			} else {
+				if (typeof headRowNo == "undefined") {
+					headRowNo = 1;
+				}
+			}
+			return this.getLocalExcel(fileObj).then(function(workbook) {
+				return new Promise(function(resolve, reject) {
+					var worksheet = workbook.getWorksheet(sheetNo);
+					if (typeof worksheet == "undefined") {
+						worksheet = workbook.worksheets[0];
+						sheetNo = worksheet.id;
+					}
+
+					var firstDataLine = headRowNo + 1;
+					//行号列的列名
+					var rowno_name = "";
+					if (isToDbColumnName) {
+						rowno_name = "sys_import_row";
+					} else {
+						rowno_name = "Row";
+					}
+					//第一列设置行号
+					var cols = [rowno_name];
+					var csvDatas = [];
+					var ret = {};
+
+					try {
+						//获取表头
+						var headRow = null;
+						if (hasHead) {
+							headRow = worksheet.getRow(headRowNo);
+						} else {
+							//没有表头的场合把第一行的列数作为全表的列数
+							headRow = worksheet.getRow(1);
+						}
+						headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+							var v = "";
+							if (hasHead) {
+								//cell.text无法处理日期类型
+								//v = cell.text;
+								v = transformString(cell.value);
+								if (v == "") {
+									v = String(colNumber);
+								}
+							} else {
+								v = String(colNumber);
+							}
+							if (isToDbColumnName) {
+								cols.push(toDbColumnName(v));
+							} else {
+								cols.push(v);
+							}
+						});
+
+						//设置表头
+						for (var i = 1; i < cols.length; i++) {
+							worksheet.getColumn(i).key = cols[i];
+						}
+
+						//获取数据
+						worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+							if (rowNumber >= firstDataLine) {
+								var rowValues = {};
+								//设置行号
+								rowValues[rowno_name] = rowNumber;
+								var isBlankRow = true;
+								//循环列的数据
+								for (var i = 1; i < cols.length; i++) {
+									var colItem = cols[i];
+									//var itemValue = row.getCell(colItem).text;
+									var itemValue = transformString(row.getCell(colItem).value);
+									if (itemValue) {
+										isBlankRow = false;
+									}
+									rowValues[colItem] = itemValue;
+								}
+								//非空白行的时候加入
+								if (!isBlankRow) {
+									csvDatas.push(rowValues);
+								}
+							}
+						});
+						workbook = null;
+
+						ret["heads"] = cols;
+						ret["details"] = csvDatas;
+						resolve(ret);
+					} catch (e) {
+						workbook = null;
+						// alert(e.message);
+						reject(e.message);
+					}
+
+				}); //end of new Promise
+
+			}); //end of getLocalExcel
+		},
+
+		//解析Excel文件，从长的行转化为短的行
+		//params: 定义长短转换的规则，参照如下方法设定
+		// {
+		// "common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
+		// "common_head_types": ["string", "string", "string", "string", "string"],
+		// "loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
+		// "level": 1, "loop_levels": [
+		// 	{"row": 1, "loop_col_starts": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
+		// ]
+		// }
+		//isToDbColumnName: 是否把title行的列名转换成db名
+		//sheetNo: sheet的序号，从1开始
+		parseLongToShort: function(fileObj, params, isToDbColumnName, sheetNo) {
+			if (typeof isToDbColumnName == "undefined") {
+				isToDbColumnName = false;
+			}
+			if (typeof sheetNo == "undefined") {
+				sheetNo = 1;
+			}
+			return this.getLocalExcel(fileObj).then(function(workbook) {
+				return new Promise(function(resolve, reject) {
+					var worksheet = workbook.getWorksheet(sheetNo);
+					if (typeof worksheet == "undefined") {
+						worksheet = workbook.worksheets[0];
+						sheetNo = worksheet.id;
+					}
+
+					var cols = [];
+					var cols_with_group = [];
+					var csvDatas = [];
+					var csvTitles = [];
+					var ret = {};
+					var i = 0, j = 0;
+					var group = 0, idx = 0, diff = 0, mod = 0, max_col_group = 0;
+					var key = "";
+
+					try {
+						var headRowNo = params.level;
+						var firstDataLine = headRowNo + 1;
+						var common_heads = params.common_heads;
+						var common_head_types = params.common_head_types;
+						var loop_col_count = params.loop_col_count;
+						var loop_heads = params.loop_heads;
+						var loop_head_types = params.loop_head_types;
+						var loop_levels = params.loop_levels;
+						
+						//获取表头
+						var headRow = null;
+						var loopLevel = null;
+						var processHead = false;
+						cols_with_group.push.apply(cols_with_group, common_heads);
+						for (i = 0; i < common_heads.length; i++) {
+							if (isToDbColumnName) {
+								cols.push(toDbColumnName(common_heads[i]));
+							} else {
+								cols.push(common_heads[i]);
+							}
+						}
+
+						for (i = 1; i <= headRowNo; i++) {
+							processHead = false;
+							for (j = 0; j < loop_levels.length; j++) {
+								if (loop_levels[j].row == i) {
+									loopLevel = loop_levels[j];
+									processHead = true;
+									break;
+								}
+							}
+							//如果是需要保存值的标题行或者是标题行的最后一行
+							if (processHead || i == headRowNo) {
+								headRow = worksheet.getRow(i);
+							} else {
+								continue;
+							}
+							
+							var csvTitle = {}, csvGroup = {};
+							headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+								diff = colNumber - common_heads.length;
+								group = Math.ceil(diff / loop_col_count);
+								mod = diff % loop_col_count;
+								if (mod == 0) {
+									idx = loop_col_count;
+								} else {
+									idx = mod;
+								}
+
+								//处理title行
+								if (processHead) {
+									var loop_col_starts = loopLevel.loop_col_starts;
+									var level_titles = loopLevel.level_titles;
+									var level_title_types = loopLevel.level_title_types;
+									for(j = 0; j < loop_col_starts.length; j++) {
+										if (loop_col_starts[j] == idx) { //需要保存title
+											if (idx == 1) { //每个group的首列
+												csvTitle = {}; //csvTitle包含一组level_titles
+												csvGroup[String(group)] = csvTitle; //csvGroup按分组号保存level_titles
+											}
+											var level_title = level_titles[j];
+											csvTitle[level_title] = getCellValue(cell, level_title_types[j]);
+											break;
+										}
+									}
+								}
+								//处理head行
+								if (i  == headRowNo && colNumber > common_heads.length) {
+									var loop_head = loop_heads[idx - 1];
+									var loop_head_with_group = loop_head + " " + String(group); //headName+空格+group号
+									cols_with_group.push(loop_head_with_group);
+								}
+							}); // end of headRow.eachCell
+
+							if (processHead) { //保存处理的title行
+								csvTitles.push(csvGroup); //csvTitles按level保存多个分组的level_titles
+								//保存第一个分组的所有列名
+								for (key in csvGroup["1"]) { 
+									if (isToDbColumnName) {
+										cols.push(toDbColumnName(key));
+									} else {
+										cols.push(key);
+									}
+								}
+							}
+
+							if (i == headRowNo) { //保存loop的最大group数和loop_heads的列名
+								max_col_group = group;
+								//保存loop_heads的所有列名
+								for (j = 0; j < loop_heads.length; j++) { 
+									var loop_head = loop_heads[j];
+									if (isToDbColumnName) {
+										cols.push(toDbColumnName(loop_head));
+									} else {
+										cols.push(loop_head);
+									}
+								}
+							}
+
+						} // end of headRowNo loop
+						//alert("end of headRowNo loop, max_col_group=" + max_col_group);
+
+						//设置表头
+						for (i = 0; i < cols_with_group.length; i++) {
+							worksheet.getColumn(i+1).key = cols_with_group[i];
+						}
+
+						//获取数据
+						worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+							if (rowNumber >= firstDataLine) {
+								var colName = "";
+								var isBlankGroup = true;
+								var groupValues = {};
+								var idx = 0;
+								
+								//循环列的数据
+								for (i = 1; i <= max_col_group; i++) {
+									isBlankGroup = true;
+									groupValues = [];
+									idx = 0;
+
+									//获取loop的值
+									for (j = 0; j < loop_col_count; j++) {
+										colName = loop_heads[j] + " " + String(i); //headName+空格+group号
+										var val = getCellValue(row.getCell(colName), loop_head_types[j]);
+										if (val) {
+											isBlankGroup = false;
+										}
+										groupValues.push(val);
+									}
+
+									if (!isBlankGroup) {
+										var line = {};
+										
+										//common_heads
+										for(j = 0; j < common_heads.length; j++) {
+											colName = common_heads[j];
+											line[cols[idx]] = getCellValue(row.getCell(colName), common_head_types[j]);
+											idx++;
+										}
+
+										//level_titles（level数可以大于1，每个level都可以有多个group，每个group又有一组title）
+										for(j = 0; j < csvTitles.length; j++) {
+											var titles = csvTitles[j][String(i)]; //csvTitles[j]对应level，String(i)对应group，titles对应group下的分组level_titles
+											var key = ""; //key对应group下每组title名称
+											for(key in titles) { 
+												line[cols[idx]] = titles[key];
+												idx++;
+											}
+										}
+
+										//loop_value
+										for (j = 0; j < loop_col_count; j++) {
+											line[cols[idx]] = groupValues[j];
+											idx++;
+										}
+
+										csvDatas.push(line);
+										//alert("end of one group: " + JSON.stringify(line));
+									} // end of one group
+
+								} // end of group loop, one line
+								//alert("end of group loop, one line");
+								
+							} // end of all data line
+						});
+						workbook = null;
+
+						ret["heads"] = cols;
+						ret["details"] = csvDatas;
+						resolve(ret);
+					} catch (e) {
+						workbook = null;
+						// alert(e.message);
+						reject(e.message);
+					}
+
+				}); //end of new Promise
+
+			}); //end of getLocalExcel
+		},
+
+		type:  "ExcelUtility"
+	};
+})();
+]]></script>
+        <script_name>ExcelUtility</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-03 09:01:34</sys_created_on>
+        <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
+        <sys_mod_count>43</sys_mod_count>
+        <sys_name>x_58872_needit.ExcelUtility</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-10 08:23:28</sys_updated_on>
+        <ui_type>10</ui_type>
+        <use_scoped_format>true</use_scoped_format>
+    </sys_ui_script>
+</record_update>

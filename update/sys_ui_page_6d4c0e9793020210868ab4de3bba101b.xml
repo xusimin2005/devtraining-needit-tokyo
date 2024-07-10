@@ -4,6 +4,11 @@
         <client_script><![CDATA[//判断是否firefox的浏览器
 var firefox = 0;
 
+//获取共通类方法
+var utility = x_58872_needit.Utility;
+var csvUtility = x_58872_needit.CsvUtility;
+var excelUtility = x_58872_needit.ExcelUtility;
+
 //取得画面参数
 var name = gel('helloName').value;
 //alert("Hello, "+name);
@@ -11,15 +16,10 @@ var name = gel('helloName').value;
 //取得server端的返回值
 var upd = gel('upd').value;
 if (upd) {
-	alert("收到，"+upd);
+	alert("ok");
+	//alert("收到，"+upd);
 	//gel('upd').value = "";
 }
-
-var doCancel = function() {
-	//gel('searchWord').text = "";
-	alert("I am canceled");
-	return false;
-};
 
 // 需要引入FileSaver.min.js和exceljs.min.js
 // 保存exceljs的文件
@@ -75,6 +75,34 @@ var getFile = function(url, type) {
 };
 
 // 纯js方法，不需要引入外部包
+// getLocalFile函数：通过FileReader读取本地文件并返回结果给Promise
+// 可以指定的文件类型有'text'，'arraybuffer'，'dataURL'，'binaryString'
+var getLocalFile = function(fileObj, type) {
+	return new Promise(function(resolve, reject) {
+		var reader = new FileReader();
+		reader.filename = fileObj.name;
+		reader.filetype = fileObj.type;
+		reader.onloadend = function(e) {
+			resolve(e.target);
+		};
+		reader.onerror = function(e) {
+			reject(e.target);
+		};
+		if (type == "arraybuffer") {
+			/* read excel */
+			reader.readAsArrayBuffer(fileObj);
+		} else if (type == "dataURL") {
+			/* read base64 */
+			reader.readAsDataURL(fileObj);
+		} else if (type == "binaryString") {
+			reader.readAsBinaryString(fileObj);
+		} else {
+			reader.readAsText(fileObj);
+		}
+	});
+};
+
+// 纯js方法，不需要引入外部包
 // getAjax函数：通过axios从指定Ajax函数返回结果给Promise
 var getAjax = function(url, functionName, params) {
 	//设定默认params为空
@@ -113,6 +141,27 @@ setTimeout(function(){
 	}
 }, 5000); //单位是毫秒
 */
+
+var doCancel = function() {
+	//gel('searchWord').text = "";
+	alert("I am canceled");
+	return false;
+};
+
+var doSubmit = function() {
+	var name = gel('uploadFileName').value;
+	var upd2 = gel('upd2').value;
+	//未选文件的时候不处理
+	if (name == "") {
+		alert("请选择文件");
+		return false;
+	} else if (upd2 == "") {
+		alert("未能正确识别文件");
+		return false;
+	} else {
+		return true;
+	}
+};
 
 var clients = [
 	{ "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
@@ -158,6 +207,16 @@ var column2 = [
 	{ name: "p5", title: "P-5", type: "number", width: 50 },
 	{ name: "s5", title: "S-5", type: "number", width: 50 }
 ];
+
+$j('input[type=radio][name=fileType]').change(function() {
+	// alert(this.value);
+	if (this.value == 'CSV') {
+		gel('uploadFile').accept = "text/csv";
+	}
+	else {
+		gel('uploadFile').accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	}
+});
 
 var dates = null;
 getAjax('x_58872_needit.GetCalendar', 'getThisMonth', null)
@@ -815,7 +874,7 @@ $j('#csvInput').change(function() {
 		//alert(JSON.stringify(buff));
 
 		//转换数据格式
-		var utility = x_58872_needit.Utility;
+		// var utility = x_58872_needit.Utility;
 		var csvDatas = buff.data.map(function(obj) {
 			var line = {
 				"item": obj.Item,
@@ -1120,9 +1179,12 @@ $j('#transform1Input').change(function() {
 		$j('#transform1Input').val("");
 
 		var workbook = new ExcelJS.Workbook();
-		var utility = x_58872_needit.Utility;
+		//var utility = x_58872_needit.Utility;
 		workbook.xlsx.load(this.result).then(function(data) {
-			worksheet = workbook.getWorksheet(1);
+			var worksheet = workbook.getWorksheet(1);
+			if (typeof worksheet == "undefined") {
+				worksheet = workbook.worksheets[0];
+			}
 
 			var firstDataLine = 2;
 			var firstDataColumn = 6;
@@ -1180,6 +1242,93 @@ $j('#transform1Input').change(function() {
 	};
 });
 
+$j('#transform2').click(function() {
+	$j('#transform2Input').click();
+});
+
+$j('#transform2Input').change(function() {
+	var name = $j('#transform2Input').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#transform2Input').prop('files')[0];
+	// 处理所选择的文件
+	var reader = new FileReader();
+	/* read Text */
+	reader.readAsArrayBuffer(fileObj);
+	reader.onload = function() {
+		//清空原选择框是为了更好的触发onChang事件
+		$j('#transform2Input').val("");
+
+		var workbook = new ExcelJS.Workbook();
+		//var utility = x_58872_needit.Utility;
+		workbook.xlsx.load(this.result).then(function(data) {
+			var worksheet = workbook.getWorksheet(1);
+			if (typeof worksheet == "undefined") {
+				worksheet = workbook.worksheets[0];
+			}
+
+			var firstDataLine = 2;
+			var firstDataColumn = 6;
+			var csvDatas = [];
+			var cols = [""];
+			//获取表头
+			var headRow = worksheet.getRow(1);
+			headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+				cols.push(utility.transformString(cell.value));
+				// if (colNumber < firstDataColumn) {
+				// 	cols.push(cell.text);
+				// } else {
+				// 	cols.push(utility.dateToString(cell.value));
+				// }
+			});
+			//设置表头
+			for (i = 1, len = cols.length; i < len; i++) {
+				worksheet.getColumn(i).key = cols[i];
+			}
+			//获取数据
+			try {
+				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+					if (rowNumber >= firstDataLine) {
+						var item = row.getCell('機種').text;
+						if (item == null || item.trim() == "") {
+							throw new Error('touch the end line');
+						}
+						row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+							if (colNumber >= firstDataColumn) {
+								var tmpVal = cell.value;
+								var val = null;
+								if (tmpVal) {
+									val = tmpVal;
+								} else {
+									val = 0;
+								}
+								var line = {
+									"機種": item,
+									"販社": row.getCell('販社').text,
+									"仕向地": row.getCell('仕向地').text,
+									"PSI": row.getCell('PSI').text,
+									"日期": cols[colNumber],
+									"数量": val
+								};
+								csvDatas.push(line);
+							}
+						});
+					}
+				});
+			} catch (e) {}
+
+			var BOM = '\uFEFF';
+			var buff = Papa.unparse(csvDatas);
+			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "文件导出测试5.csv");
+		}).catch(function(error) {
+			alert(error.message);
+		});
+	};
+});
+
 $j('#change_data').click(function() {
 	var d = null;
 	var c = null;
@@ -1214,6 +1363,206 @@ $j('#change_data').click(function() {
 $j('#get_date').click(function() {
 	var dt = new GlideDateTime();
 	alert(dt.getDisplayValue());
+});
+
+// //解析CSV文件
+// var parseNormalCsv = function(fileObj, htmlObj) {
+// 	gel(htmlObj).value = "";
+// 	Papa.parse(fileObj, {
+// 		complete: function(results) {
+// 			// gel(htmlObj).value = JSON.stringify(results.data);
+// 			var datas = results.data;
+// 			var errors = results.errors;
+// 			if (errors.length > 0) {
+// 				alert("文件格式异常：" + JSON.stringify(errors));
+// 				return;
+// 			}
+// 			if (datas.length < 1) {
+// 				alert("没有数据");
+// 				return;
+// 			}
+// 			var rowno_name = "sys_import_row";
+// 			var cols = [rowno_name];
+// 			var csvDatas = [];
+// 			var ret = {};
+// 			// alert("开始解析");
+// 			for(var i = 0; i < datas.length; i++) {
+// 				var data = datas[i];
+// 				if (i == 0) { //获取表头
+// 					for (var j = 0; j < data.length; j++) {
+// 						var v = data[j];
+// 						if (v == "") {
+// 							v = String(j + 1);
+// 						}
+// 						cols.push("u_" + v.toLowerCase().replaceAll(" ", "_"));
+// 					}
+// 					// alert("获取表头：" + JSON.stringify(cols));
+// 				} else { //获取数据
+// 					//cols因为增加了一个行号列，所以比数据列多一列
+// 					if (data.length != (cols.length-1)) {
+// 						//列数不一致
+// 						// alert("列数不一致，data.length=" + data.length);
+// 						continue;
+// 					}
+// 					var line = {"sys_import_row": i};
+// 					var isBlankLine = true;
+// 					for (var k = 0; k < data.length; k++) {
+// 						var colName = cols[k+1];
+// 						var colValue = data[k];
+// 						if (colValue) {
+// 							isBlankLine = false;
+// 						}
+// 						line[colName] = colValue;
+// 					}
+// 					// alert("获取数据：" + JSON.stringify(line));
+// 					if (!isBlankLine) {
+// 						csvDatas.push(line);
+// 					}
+// 				}
+// 			}
+// 			ret["heads"] = cols;
+// 			ret["details"] = csvDatas;
+// 			gel(htmlObj).value = JSON.stringify(ret);
+// 		}
+// 	});
+// };
+
+// //解析Excel文件
+// var parseNormalExcel = function(fileObj, htmlObj) {
+// 	gel(htmlObj).value = "";
+// 	getLocalFile(fileObj, 'arraybuffer').then(function(reader) {
+// 		var workbook = new ExcelJS.Workbook();
+
+// 		workbook.xlsx.load(reader.result).then(function(data) {
+// 			worksheet = workbook.getWorksheet(1);
+
+// 			var firstDataLine = 2;
+// 			//行号列的列名
+// 			var rowno_name = "sys_import_row";
+// 			var datas = {};
+// 			var dbHeads = [];
+// 			//第一列设置行号
+// 			var cols = [rowno_name];
+// 			var csvDatas = [];
+// 			//获取表头
+// 			var headRow = worksheet.getRow(1);
+// 			headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+// 				cols.push(utility.transformString(cell.value));
+// 			});
+// 			dbHeads = cols.map(function(v, index) {
+// 				if (v == "") {
+// 					v = String(index);
+// 				}
+// 				//第一列行号不变换
+// 				if (index == 0) {
+// 					return v;
+// 				} else {
+// 					return "u_" + v.toLowerCase().replaceAll(" ", "_");
+// 				}
+// 			});
+// 			//设置表头
+// 			for (i = 1, len = dbHeads.length; i < len; i++) {
+// 				worksheet.getColumn(i).key = dbHeads[i];
+// 			}
+// 			//获取数据
+// 			try {
+// 				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+// 					if (rowNumber >= firstDataLine) {
+// 						var rowValues = {"sys_import_row": rowNumber};
+// 						var isBlankRow = true;
+// 						//循环列的数据
+// 						for (var i = 1; i < dbHeads.length; i++) {
+// 							var colItem = dbHeads[i];
+// 							var itemValue = row.getCell(colItem).text;
+// 							if (itemValue) {
+// 								isBlankRow = false;
+// 							}
+// 							rowValues[colItem] = itemValue;
+// 						}
+// 						//非空白行的时候加入
+// 						if (!isBlankRow) {
+// 							csvDatas.push(rowValues);
+// 						}
+// 					}
+// 				});
+// 				datas["heads"] = dbHeads;
+// 				datas["details"] = csvDatas;
+// 				gel(htmlObj).value = JSON.stringify(datas);
+// 			} catch (e) {
+// 				alert(e.message);
+// 			}
+
+// 		}).catch(function(error) {
+// 			alert(error.message);
+// 		});
+// 	});
+// };
+
+$j('#uploadFile').change(function() {
+	var name = $j('#uploadFile').prop('value');
+	//未选文件的时候不处理
+	if (name == "") {
+		return;
+	}
+	var fileObj = $j('#uploadFile').prop('files')[0];
+	getLocalFile(fileObj, 'dataURL').then(function(reader) {
+		gel('uploadFileName').value = reader.filename;
+		gel('upd').value = reader.result;
+		//gel('uploadFileType').value = reader.filetype;
+		if (reader.filetype == "text/csv") {
+			gel('uploadFileType').value = "CSV";
+			//解析CSV内容，保存到upd2
+			//parseNormalCsv(fileObj, "upd2");
+			csvUtility.parseNormalCsv(fileObj, true)
+				.then(function(datas) {
+					gel('upd2').value = JSON.stringify(datas);
+					alert("get " + datas.details.length + " data lines");
+				}).catch(function(message) {
+					alert(message);
+					gel('upd2').value = "";
+				});
+		} else {
+			gel('uploadFileType').value = "Excel";
+			//解析Excel内容，保存到upd2
+			//parseNormalExcel(fileObj, "upd2");
+			// excelUtility.parseNormalExcel(fileObj, true)
+			// 	.then(function(datas) {
+			// 		gel('upd2').value = JSON.stringify(datas);
+			// 	}).catch(function(message) {
+			// 		alert(message);
+			// 		gel('upd2').value = "";
+			// 	});
+			var params = {
+				"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
+				"common_head_types": ["string", "string", "string", "string", "string"],
+				"loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
+				"level": 1, "loop_levels": [
+					{"row": 1, "loop_col_starts": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
+				]
+			};
+			excelUtility.parseLongToShort(fileObj, params)
+				.then(function(datas) {
+					gel('upd2').value = JSON.stringify(datas);
+					alert("get " + datas.details.length + " data lines");
+					// var BOM = '\uFEFF';
+					// var buff = Papa.unparse(datas.details);
+					// var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
+					// saveAs(blob, "文件导出测试4.csv");
+				}).catch(function(message) {
+					alert(message);
+					gel('upd2').value = "";
+				});
+		}
+	}).catch(function(reader) {
+		gel('upd').value = "";
+		gel('upd2').value = "";
+		gel('uploadFileName').value = "";
+		gel('uploadFileType').value = "";
+		alert("文件加载失败");
+	});
+
+	//清空原选择框是为了更好的触发onChang事件
+	$j('#uploadFile').val("");
 });]]></client_script>
         <description/>
         <direct>false</direct>
@@ -1230,6 +1579,22 @@ $j('#get_date').click(function() {
 	if (typeof upd == "undefined") {
 		var upd = "";
 	}
+	//定义upd2的初始值
+	if (typeof upd2 == "undefined") {
+		var upd2 = "";
+	}
+	//定义uploadFileName的初始值
+	if (typeof uploadFileName == "undefined") {
+		var uploadFileName = "";
+	}
+	//定义uploadFileType的初始值
+	if (typeof uploadFileType == "undefined") {
+		var uploadFileType = "";
+	}
+	//定义uploadTableName的初始值
+	if (typeof uploadTableName == "undefined") {
+		var uploadTableName = "x_58872_needit_a0_temp";
+	}
 	//定义helloName的初始值
 	if (typeof helloName == "undefined") {
 		//获取url参数
@@ -1237,6 +1602,18 @@ $j('#get_date').click(function() {
 		if (helloName == "" || helloName == null) {
 			helloName = "Everyone";
 		}
+	}
+</g:evaluate>
+
+<!-- 获取uploadTableName下拉框的值 -->
+<g:evaluate object="true">
+	var upload_tables = [];
+	var gr = new GlideRecordSecure("sys_db_object");
+	gr.addQuery("name", "STARTSWITH" , "x_58872");
+	gr.addQuery("super_class", "=" , "c56370e03c31311068bcf327dfe37f82");
+	gr.query();
+	while (gr.next()) {
+		upload_tables.push({"name": gr.getValue("name"), "label": gr.getValue("label")});
 	}
 </g:evaluate>
 
@@ -1251,7 +1628,7 @@ $j('#get_date').click(function() {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<!-- <g:requires name="Utility.jsdbx"/> -->
 	<g:evaluate object="true">
-		var uiscripts = ["x_58872_needit.Utility"];
+		var uiscripts = ["x_58872_needit.Utility", "x_58872_needit.CsvUtility", "x_58872_needit.ExcelUtility"];
 		var jslibs = [];
 		for (var key in uiscripts) {
 			var gr = new GlideRecordSecure('sys_ui_script');	
@@ -1272,7 +1649,20 @@ $j('#get_date').click(function() {
 	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
 	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
 	<!-- <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" /> -->
+	<!-- 自定义样式 -->
 	<style type="text/css">
+		select {
+			/* margin-bottom: 10px;
+			margin-top: 10px; */
+			font-family: cursive, sans-serif;
+			outline: 0;
+			/* background: #2ecc71;
+			color: #fff;
+			border: 1px solid crimson; */
+			padding: 4px;
+			border-radius: 9px;
+		}
+		
 		.bottom_area table {
 			float: right;
 		}
@@ -1325,6 +1715,10 @@ $j('#get_date').click(function() {
 						<button id="transform1">Excel数据转换1</button>
 					</td>
 					<td>
+						<input type="file" id="transform2Input" style="display: none;"/>
+						<button id="transform2">Excel数据转换2</button>
+					</td>
+					<td>
 						<button id="change_data">变更数据</button>
 					</td>
 					<td>
@@ -1357,25 +1751,64 @@ $j('#get_date').click(function() {
 			</tr>
 		</tfoot>
 	</table> -->
-	<g:ui_form>
+	<g:ui_form onsubmit="return doSubmit()">
 		<table>
 			<tbody>
 				<tr>
 					<td>
-						<input type="text" class="form-control" name="searchWord" placeholder="条件" value="${searchWord}" cols="50"/>
-						<input name="application_sys_id" id="application_sys_id" value="499836460a0a0b1700003e7ad950b5da" type="hidden" />
+						<span class="input-group-radio">
+							<input id="radio1" class="radio" type="radio" checked="checked" name="fileType" value="Excel"/>
+							<label for="radio1" class="radio-label"> Excel</label>
+						</span>
+						<span class="input-group-radio">
+							<input id="radio2" class="radio" type="radio" name="fileType" value="CSV"/>
+							<label for="radio2" class="radio-label"> CSV</label>
+						</span>
+						<input type="text" class="form-control" name="searchWord" placeholder="条件" value="${searchWord}" cols="50" style="display: none;" />
 						<input name="helloName" id="helloName" value="${helloName}" type="hidden" />
 					</td>
 					<td>
+						<input type="file" id="uploadFile" name="uploadFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+						<!-- <input type="file" id="uploadFile" name="uploadFile"  /> -->
+					</td>
+					<td>
 						<!-- <g:dialog_buttons_ok_cancel ok="return true" cancel="return doCancel()" /> -->
-						<button type="submit" id="submit_button"><span>提交</span></button>
+						<button type="submit" id="submit_button">提交</button>
 					</td>
 				</tr>
 				<tr>
-					<td>
-						<textarea id="upd" name="upd" rows="4" cols="50" style="resize: none;">${upd}</textarea>
+					<td colspan="2"><input type="text" class="form-control" id="uploadFileName" name="uploadFileName" value="${uploadFileName}" cols="50" /></td>
+					<td><input type="text" class="form-control" id="uploadFileType" name="uploadFileType" value="${uploadFileType}" cols="50" /></td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<label for="uploadTableName">目标表格：</label>
+						<select name="uploadTableName" id="uploadTableName">
+							<option value="">请选择目标</option>
+							<j:forEach var="jvar_upload_table" items="${upload_tables}">
+								<g:evaluate jelly="true">
+									var js_upload_table_name = jelly.jvar_upload_table.name;
+									var js_upload_table_label = jelly.jvar_upload_table.label;
+								</g:evaluate>
+								<j:if test="${uploadTableName == js_upload_table_name}">
+									<option value="${js_upload_table_name}" selected="true">${js_upload_table_name}</option>
+								</j:if>
+								<j:if test="${uploadTableName != js_upload_table_name}">
+									<option value="${js_upload_table_name}">${js_upload_table_name}</option>
+								</j:if>
+							</j:forEach>
+						</select>
 					</td>
-					<td></td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<textarea id="upd" name="upd" rows="4" cols="100" style="display: none; resize: none;">${upd}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<textarea id="upd2" name="upd2" rows="4" cols="100" style="display: none; resize: none;">${upd2}</textarea>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -1393,9 +1826,87 @@ $j('#get_date').click(function() {
 //var helloName = helloName;
 //var upd = searchWord;
 //gs.info("MyDebug -INFO- Received form value for process ->" + application_sys_id);
-gs.info("MyDebug -INFO- Received form value for process ->" + helloName);
-gs.info("MyDebug -INFO- Received form value for process ->" + searchWord);
-gs.info("MyDebug -INFO- Received form value for process ->" + upd);
+gs.info("MyDebug -INFO- Received form value for process helloName->" + helloName);
+gs.info("MyDebug -INFO- Received form value for process searchWord->" + searchWord);
+gs.info("MyDebug -INFO- Received form value for process uploadFileName->" + uploadFileName);
+gs.info("MyDebug -INFO- Received form value for process uploadFileType->" + uploadFileType);
+gs.info("MyDebug -INFO- Received form value for process uploadTableName->" + uploadTableName);
+//gs.info("MyDebug -INFO- Received form value for process ->" + upd);
+
+// var userCount = new global.GlideQuery('x_58872_needit_c0').count();
+// gs.info("MyDebug -INFO- x_58872_needit_c0 count ->" + userCount);
+// new global.GlideQuery('x_58872_needit_c0').deleteMultiple();
+// gs.info("MyDebug -INFO- x_58872_needit_c0 deleted");
+
+var tester = new global.TestGlobal();
+//作成datasource，并取得sysid
+var dsr = tester.test(uploadFileName, uploadFileType, uploadTableName);
+//获取datasource的record
+var dataSource = new GlideRecordSecure('sys_data_source');
+dataSource.get(dsr);
+
+/*
+(2) Step Two: Attach file for processing to the record in Step One.
+This is a made up example where we copy an existing attachment from Incident to the Data Source created above
+*/
+var gsa = new GlideSysAttachment();
+var searchStr = "base64,";
+var base64String = upd.substring(upd.indexOf(searchStr)+searchStr.length);
+var attachmentId = gsa.writeBase64(dataSource, uploadFileName, uploadFileType, base64String);
+gs.info('MyDebug -INFO- The attachment sys_id ->' + attachmentId);
+
+/*
+(3) Step Three: Load / Process the attached file on the Data Source Record from Step Two.
+- Assumes that you have already made an Import set table that is identified in the Data Source Record from Step One.
+- Creates an entry in Import Sets [sys_import_set]
+- Creates a row by row import created in Import Set Rows [sys_import_set_row]
+*/
+// var loader = new GlideImportSetLoader();
+// var importSetRec = loader.getImportSetGr(dataSource);
+// var ranload = loader.loadImportSetTable(importSetRec, dataSource);
+// importSetRec.state = "loaded";
+// importSetRec.update();
+
+//Create Import Set
+var impSet = new GlideRecordSecure('sys_import_set');
+//impSet.mode = "asynchronous";
+impSet.state = "loaded";
+impSet.table_name = uploadTableName;
+impSet.short_description = "Type: File\nFormat: " + uploadFileType;
+impSet.data_source = dsr; //data source
+impSet.load_completed = new GlideDateTime().getDisplayValue();
+impSet.load_run_time = new GlideDuration(0);
+var impSet_id = impSet.insert();
+gs.info('MyDebug -INFO- impSet_id ->' + impSet_id);
+
+//获取明细数据
+var datas = JSON.parse(upd2);
+var importData = new GlideRecordSecure(impSet.table_name);
+var lineBuff = "";
+datas.details.forEach(function(item) {
+	//gs.info('MyDebug -INFO- item.u_company [' + item.u_company + ']');
+	importData.initialize();
+	lineBuff = "";
+	importData.sys_import_set = impSet_id; //Sys_id of the newly created import set
+	for (var i = 0; i < datas.heads.length; i++) {
+		var colItem = datas.heads[i];
+		var itemValue = item[colItem];
+		importData.setValue(colItem, itemValue);
+		if (i > 0) lineBuff += ", ";
+		lineBuff += colItem + " = [" + itemValue + "]";
+	}
+	importData.insert();
+	// gs.info('MyDebug -INFO- item ->' +  lineBuff);
+});
+
+// //Finished loading the import set
+// var updImpSet = new GlideRecordSecure('sys_import_set');
+// updImpSet.get(impSet_id);
+// updImpSet.state = "loaded";
+// updImpSet.load_completed = new GlideDateTime().getDisplayValue();
+// updImpSet.update();
+// gs.info('MyDebug -INFO- impSet loaded');
+
 
 //var urlOnStack = GlideSession.get().getStack().bottom();
 //response.sendRedirect(urlOnStack);
@@ -1409,19 +1920,20 @@ gs.info("MyDebug -INFO- Received form value for process ->" + upd);
 // } else {
 // 	gs.error(">>>Error: Cannot load ui page: " + this.sys_id);
 // }
+response.sendRedirect(encodeURI("sys_import_set_list.do"));
 
 ]]></processing_script>
         <sys_class_name>sys_ui_page</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-14 03:12:55</sys_created_on>
         <sys_id>6d4c0e9793020210868ab4de3bba101b</sys_id>
-        <sys_mod_count>953</sys_mod_count>
+        <sys_mod_count>1093</sys_mod_count>
         <sys_name>sample_page</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_6d4c0e9793020210868ab4de3bba101b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-06-27 08:08:56</sys_updated_on>
+        <sys_updated_on>2024-07-10 09:34:08</sys_updated_on>
     </sys_ui_page>
 </record_update>

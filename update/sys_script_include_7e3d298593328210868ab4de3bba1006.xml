@@ -127,19 +127,89 @@ ExcelParser.prototype = {
 		return ret;
 	}, 
 
+	//解析通用列表
+	parseNormal: function(attachmentId) {
+		//返回值
+		var ret = true;
+		var heads = []; //返回表头数据
+		var details = []; //返回数据的数组
+		var dbHeads = [];
+
+		var parser = new sn_impex.GlideExcelParser();
+		var attachment = new GlideSysAttachment();
+		try {
+			// use attachment sys id of an excel file
+			var attachmentStream = attachment.getContentStream(attachmentId);
+
+			parser.parse(attachmentStream);
+
+			// retrieve the column headers
+			heads = parser.getColumnHeaders();
+			dbHeads = heads.map(function(v) {
+				return "u_" + v.toLowerCase().replaceAll(" ", "_");
+			});
+						
+			var row = null;
+			var rowValues = null;
+
+			var headRows = 1;
+			var currentRow = headRows + 1; //数据行从第二行开始
+
+			//获取明细数据
+			while (parser.next()) {
+				//从数据行开始取数据
+				if (currentRow > headRows) {
+					//获取行数据
+					row = parser.getRow();
+					//gs.info(JSON.stringify(row));
+					rowValues = {"sys_import_row": currentRow};
+					var isBlankRow = true;
+					//循环列的数据
+					for (var i = 0; i < heads.length; i++) {
+						var colItem = heads[i];
+						var dbItem = dbHeads[i];
+						var itemValue = row[colItem];
+						if (itemValue) {
+							isBlankRow = false;
+						}
+						rowValues[dbItem] = itemValue;
+					}
+					//非空白行的时候加入
+					if (!isBlankRow) {
+						details.push(rowValues);
+					}
+				}
+				currentRow++;
+			}
+
+		} catch(ex) {
+			this.message = ex.message;
+			ret = false;
+		}
+		finally {
+			//释放内存
+			parser.close(); // close the stream and release the document
+		}
+
+		//设置返回值
+		this.datas["heads"] = dbHeads;
+		this.datas["details"] = details;
+		return ret;
+	}, 
+
     type: 'ExcelParser'
 };]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-06-13 07:55:21</sys_created_on>
         <sys_id>7e3d298593328210868ab4de3bba1006</sys_id>
-        <sys_mod_count>27</sys_mod_count>
+        <sys_mod_count>30</sys_mod_count>
         <sys_name>ExcelParser</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_script_include_7e3d298593328210868ab4de3bba1006</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-06-15 07:31:51</sys_updated_on>
+        <sys_updated_on>2024-07-01 07:51:42</sys_updated_on>
     </sys_script_include>
 </record_update>
