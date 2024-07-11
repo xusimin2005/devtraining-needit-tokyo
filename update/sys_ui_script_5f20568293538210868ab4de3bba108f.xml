@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_58872_needit.AxiosUtility</name>
+        <script><![CDATA[var x_58872_needit = x_58872_needit || {};
+
+// 需要引入获取url文件的外部js(axios)
+x_58872_needit.AxiosUtility = (function() {
+	"use strict";
+
+/* set your private variables and functions here. For example: 
+	var privateVar = 0; 
+	function private_function() {
+		return ++privateVar;
+	}
+*/
+	// 通过axios从指定URL下载文件并返回Promise
+	// 可以指定的文件类型有'json'，'arraybuffer'，'text'，'blob'
+	function getFile(url, type) {
+		//设定默认type为blob
+		if (typeof type == 'undefined' || type == null) {
+			type = "blob";
+		}
+		var param = {
+			"method": "get",
+			"url": url,
+			"responseType": type
+		};
+		return new Promise(function(resolve, reject) {
+			axios(param).then(function(data) {
+				resolve(data.data);
+			}).catch(function(error) {
+				reject(error);
+			});
+		});
+	}
+
+/* Share variables between multiple UI scripts by adding them to your scope object. For example: 
+	x_58872_needit.sharedVar = 0; 
+
+ Then access them in your scripts the same way. For example: 
+	function get_shared() {
+		return x_58872_needit.sharedVar;
+	}
+*/
+
+	return {
+
+/* set your public API here. For example:
+		incrementAndReturnPrivateVar: function() {
+			return private_function();
+		},
+*/
+		//获得Excel附件
+		//return: Promise，成功值（附件对象的arraybuffer），失败值（失败原因）
+		getExcelAttachment: function(attachmentId) {
+			var url = "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId;
+			return getFile(url, 'arraybuffer');
+		},
+
+		type:  "AxiosUtility"
+	};
+})();
+]]></script>
+        <script_name>AxiosUtility</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-11 09:31:24</sys_created_on>
+        <sys_id>5f20568293538210868ab4de3bba108f</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>x_58872_needit.AxiosUtility</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_script_5f20568293538210868ab4de3bba108f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-11 10:06:46</sys_updated_on>
+        <ui_type>10</ui_type>
+        <use_scoped_format>true</use_scoped_format>
+    </sys_ui_script>
+</record_update>

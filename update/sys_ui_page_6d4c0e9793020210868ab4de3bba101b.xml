@@ -8,6 +8,7 @@ var firefox = 0;
 var utility = x_58872_needit.Utility;
 var csvUtility = x_58872_needit.CsvUtility;
 var excelUtility = x_58872_needit.ExcelUtility;
+var axiosUtility = x_58872_needit.AxiosUtility;
 
 //取得画面参数
 var name = gel('helloName').value;
@@ -21,37 +22,6 @@ if (upd) {
 	//gel('upd').value = "";
 }
 
-// 需要引入FileSaver.min.js和exceljs.min.js
-// 保存exceljs的文件
-var saveExceljs = function(workbook, fileName) {
-	// 导出文件
-	workbook.xlsx.writeBuffer().then(function(data) {
-		var blob = new Blob([data], { type: 'application/octet-stream' });
-		saveAs(blob, fileName);
-	});
-};
-
-// 需要引入exceljs.min.js
-// 根据参数做成并返回Excel Sheet
-// sheetOptions：设定Sheet的冻结表头的参数，可以不设
-var getExcelSheet = function(workbook, sheetName, 
-	titleColumns, subTitleColumns, dataRows, sheetOptions) {
-	if (typeof sheetOptions == 'undefined' || sheetOptions == null) {
-		sheetOptions = {};
-	}
-	var worksheet = workbook.addWorksheet(sheetName, sheetOptions);
-	//设置表头
-	worksheet.columns = titleColumns;
-	//设置副标题
-	if (!(typeof subTitleColumns == 'undefined' || subTitleColumns == null)) {
-		worksheet.addRows(subTitleColumns);
-	}
-	//设置数据
-	worksheet.addRows(dataRows);
-
-	return worksheet;
-};
-
 // 需要引入axios.min.js
 // getFile函数：通过axios从指定URL下载文件并返回Promise
 // 可以指定的文件类型有'json'，'arraybuffer'，'text'，'blob'
@@ -60,7 +30,6 @@ var getFile = function(url, type) {
 	if (typeof type == 'undefined' || type == null) {
 		type = "blob";
 	}
-
 	return new Promise(function(resolve, reject) {
 		axios({
 			method: 'get',
@@ -70,59 +39,6 @@ var getFile = function(url, type) {
 			resolve(data.data);
 		}).catch(function(error) {
 			reject(error);
-		});
-	});
-};
-
-// 纯js方法，不需要引入外部包
-// getLocalFile函数：通过FileReader读取本地文件并返回结果给Promise
-// 可以指定的文件类型有'text'，'arraybuffer'，'dataURL'，'binaryString'
-var getLocalFile = function(fileObj, type) {
-	return new Promise(function(resolve, reject) {
-		var reader = new FileReader();
-		reader.filename = fileObj.name;
-		reader.filetype = fileObj.type;
-		reader.onloadend = function(e) {
-			resolve(e.target);
-		};
-		reader.onerror = function(e) {
-			reject(e.target);
-		};
-		if (type == "arraybuffer") {
-			/* read excel */
-			reader.readAsArrayBuffer(fileObj);
-		} else if (type == "dataURL") {
-			/* read base64 */
-			reader.readAsDataURL(fileObj);
-		} else if (type == "binaryString") {
-			reader.readAsBinaryString(fileObj);
-		} else {
-			reader.readAsText(fileObj);
-		}
-	});
-};
-
-// 纯js方法，不需要引入外部包
-// getAjax函数：通过axios从指定Ajax函数返回结果给Promise
-var getAjax = function(url, functionName, params) {
-	//设定默认params为空
-	if (typeof params == 'undefined' || params == null) {
-		params = {};
-	}
-
-	return new Promise(function(resolve, reject) {
-		var ga = new GlideAjax(url);
-		ga.addParam('sysparm_name', functionName);
-		for (var key in params) {
-			ga.addParam('sysparm_' + key, params[key]);
-		}
-		ga.getXMLAnswer(function(answer) {
-			var jsonObj = JSON.parse(answer);
-			if (jsonObj.result == "ok") {
-				resolve(jsonObj);
-			} else {
-				reject(jsonObj);
-			}
 		});
 	});
 };
@@ -219,31 +135,31 @@ $j('input[type=radio][name=fileType]').change(function() {
 });
 
 var dates = null;
-getAjax('x_58872_needit.GetCalendar', 'getThisMonth', null)
+utility.getAjax('x_58872_needit.GetCalendar', 'getThisMonth', null)
 	.then(function(data) {
 		dates = data.datas;
 		//alert("ThisMonth="+dates);
 	})
-	.catch(function(data) {
-		alert("获取日期数据失败："+data.message);
+	.catch(function(message) {
+		alert("获取日期数据失败：" + message);
 	});
 
 //获取附件id号
 var attachmentId = "";
 //var attachmentParams = {table_name: "x_58872_needit_t0", record_id: "0c3245599379c210868ab4de3bba1029"};
 var attachmentParams = {table_name: "x_58872_needit_t0", file_name: "simple-demo.xlsx"};
-getAjax('x_58872_needit.GetAttachmentId', 'getFromTable', attachmentParams)
+utility.getAjax('x_58872_needit.GetAttachmentId', 'getFromTable', attachmentParams)
 	.then(function(data) {
 		attachmentId = data.id;
 		//alert("附件="+attachmentId);
 	})
-	.catch(function(data) {
-		alert("没有取到附件");
+	.catch(function(message) {
+		alert("获取附件id失败: " + message);
 	});
 
 //获取数据
 var gridDatas = [];
-getAjax('x_58872_needit.RefreshPsiChange', 'collect', {type: "ccc"})
+utility.getAjax('x_58872_needit.RefreshPsiChange', 'collect', {type: "ccc"})
 	.then(function(data) {
 		gridDatas = data.records;
 
@@ -307,7 +223,6 @@ var getSubTitleColumns = function() {
 };
 
 // 绑定按钮事件
-
 $j("#xport").bind('click', function() {
 	/* dynamically import the scripts in the event listener */
 	var workbook = new ExcelJS.Workbook();
@@ -317,7 +232,6 @@ $j("#xport").bind('click', function() {
 	var url1 = '/x_58872_needit_u0_list.do?JSONv2';
 	var promise1 = getFile(url1, 'json').then(function(data) {
 		var jsonDatas = data.records;
-		var utility = x_58872_needit.Utility;
 
 		// 修正数据类型（把数值类型的字符串转换为数值类型）
 		jsonDatas.forEach(function(item, index) {
@@ -327,7 +241,7 @@ $j("#xport").bind('click', function() {
 			utility.typeTransform(item, "s5", "number");
 		});
 
-		var worksheet = getExcelSheet(
+		var worksheet = excelUtility.createExcelSheet(
 			workbook, 'My Sheet1', getTitleColumns(), 
 			getSubTitleColumns(), jsonDatas,
 			{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
@@ -412,10 +326,10 @@ $j("#xport").bind('click', function() {
 	//获取Sheet2的数据
 	if (gridDatas.length == 0) {
 		var url2 = 'x_58872_needit.RefreshPsiChange';
-		var promise2 = getAjax(url2, 'collect', {type: "ccc"}).then(function(data) {
+		var promise2 = utility.getAjax(url2, 'collect', {type: "ccc"}).then(function(data) {
 			var jsonDatas = data.records;
 
-			var worksheet = getExcelSheet(
+			var worksheet = excelUtility.createExcelSheet(
 				workbook, 'My Sheet2', getTitleColumns(), 
 				getSubTitleColumns(), jsonDatas,
 				{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
@@ -430,7 +344,7 @@ $j("#xport").bind('click', function() {
 		});
 		promises.push(promise2);
 	} else {
-			var worksheet = getExcelSheet(
+			var worksheet = excelUtility.createExcelSheet(
 				workbook, 'My Sheet2', getTitleColumns(), 
 				getSubTitleColumns(), gridDatas,
 				{views:[{state: 'frozen', xSplit: 1, ySplit:3}]}
@@ -447,7 +361,7 @@ $j("#xport").bind('click', function() {
 	// 等待所有文件处理完成
 	Promise.all(promises).then(function() {
 		// 导出excel
-		saveExceljs(workbook, 'simple-demo1.xlsx');
+		excelUtility.saveExcel(workbook, 'simple-demo1.xlsx');
 	});
 
 	
@@ -615,7 +529,7 @@ $j('#fileInput').change(function() {
 
 
 			// 导出excel
-			saveExceljs(workbook, 'simple-demo2.xlsx');
+			excelUtility.saveExcel(workbook, 'simple-demo2.xlsx');
 		}).catch(function(error) {
 			alert(error.message);
 		});
@@ -629,10 +543,9 @@ $j('#down').click(function() { //attachmentId
 		return;
 	}
 	//var url = 'https://dev196248.service-now.com/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=f70f7de8932a0210868ab4de3bba10be';
-	var url = "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId;
-	getFile(url, 'arraybuffer').then(function(buff) {
-		var workbook = new ExcelJS.Workbook();
-		workbook.xlsx.load(buff).then(function(data) {
+	//var url = "/sys_attachment.do?sysparm_referring_url=tear_off&view=true&sys_id=" + attachmentId;
+	axiosUtility.getExcelAttachment(attachmentId).then(function(arraybuffer) {
+		excelUtility.createExcelWorkbook(arraybuffer).then(function(workbook) {
 			worksheet = workbook.getWorksheet(1);
 			var headrow = 5;
 			//判断表头是否一致
@@ -686,9 +599,10 @@ $j('#down').click(function() { //attachmentId
 				}
 			});
 			// 导出excel
-			saveExceljs(workbook, 'simple-demo3.xlsx');
-		}).catch(function(error) {
-			alert(error.message);
+			excelUtility.saveExcel(workbook, 'simple-demo3.xlsx');
+		})
+		.catch(function(message) {
+			alert(message);
 		});
 	});
 });
@@ -707,7 +621,7 @@ $j('#packing_down').click(function() { //attachmentId
 	promises.push(promise1);
 
 	var url2 = 'x_58872_needit.GetPackingData';
-	var promise2 = getAjax(url2, 'getByInvoiceNo', {"invoice_no": "FGS23044778"})
+	var promise2 = utility.getAjax(url2, 'getByInvoiceNo', {"invoice_no": "FGS23044778"})
 		.then(function(data) {
 			packingData = data.records;
 			footData = data.totals;
@@ -750,7 +664,7 @@ $j('#packing_down').click(function() { //attachmentId
 			row.getCell("M3").value = footData["M3"];
 
 			// 导出excel
-			saveExceljs(workbook, 'simple-demo5.xlsx');
+			excelUtility.saveExcel(workbook, 'simple-demo5.xlsx');
 		}).catch(function(error) {
 			alert("发生错误："+error.message);
 		});
@@ -820,7 +734,7 @@ $j('#csvDown').change(function() {
 			} catch (e) {}
 
 			// 导出excel
-			//saveExceljs(workbook, 'simple-demo2.xlsx');
+			//excelUtility.saveExcel(workbook, 'simple-demo2.xlsx');
 
 			//重新排列csv数据
 			//var cols = getTitleColumns();
@@ -948,7 +862,7 @@ $j('#csvInput').change(function() {
 					}
 				});
 				// 导出excel
-				saveExceljs(workbook, 'simple-demo4.xlsx');
+				excelUtility.saveExcel(workbook, 'simple-demo4.xlsx');
 			}).catch(function(error) {
 				alert(error.message);
 			});
@@ -1134,12 +1048,12 @@ $j('#excelSave').change(function() {
 				"invoice_data": invoiceData,
 				"record_data": saveData
 			};
-			getAjax('x_58872_needit.SavePsiData', 'save', params)
+			utility.getAjax('x_58872_needit.SavePsiData', 'save', params)
 				.then(function(data) {
 					alert("已保存");
 				})
-				.catch(function(ex) {
-					alert(ex.message);
+				.catch(function(message) {
+					alert(message);
 				});
 		}).catch(function(error) {
 			alert(error.message);
@@ -1148,14 +1062,14 @@ $j('#excelSave').change(function() {
 });
 
 $j('#save_excel2').click(function() {
-	getAjax('x_58872_needit.ExcelParser', 'packing', {})
+	utility.getAjax('x_58872_needit.ExcelParser', 'packing', {})
 		.then(function(data) {
 			data.records.forEach(function(item, index) {
 				//alert("col"+index+"="+item);
 			});
 		})
-		.catch(function(data) {
-			alert("执行失败："+data.message);
+		.catch(function(message) {
+			alert("执行失败："+message);
 		});
 });
 
@@ -1171,75 +1085,20 @@ $j('#transform1Input').change(function() {
 	}
 	var fileObj = $j('#transform1Input').prop('files')[0];
 	// 处理所选择的文件
-	var reader = new FileReader();
-	/* read Text */
-	reader.readAsArrayBuffer(fileObj);
-	reader.onload = function() {
-		//清空原选择框是为了更好的触发onChang事件
-		$j('#transform1Input').val("");
-
-		var workbook = new ExcelJS.Workbook();
-		//var utility = x_58872_needit.Utility;
-		workbook.xlsx.load(this.result).then(function(data) {
-			var worksheet = workbook.getWorksheet(1);
-			if (typeof worksheet == "undefined") {
-				worksheet = workbook.worksheets[0];
-			}
-
-			var firstDataLine = 2;
-			var firstDataColumn = 6;
-			var csvDatas = [];
-			var cols = [""];
-			//获取表头
-			var headRow = worksheet.getRow(1);
-			headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-				cols.push(utility.transformString(cell.value));
-				// if (colNumber < firstDataColumn) {
-				// 	cols.push(cell.text);
-				// } else {
-				// 	cols.push(utility.dateToString(cell.value));
-				// }
-			});
-			//设置表头
-			for (i = 1, len = cols.length; i < len; i++) {
-				worksheet.getColumn(i).key = cols[i];
-			}
-			//获取数据
-			try {
-				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-					if (rowNumber >= firstDataLine) {
-						var item = row.getCell('機種').text;
-						if (item == null || item.trim() == "") {
-							throw new Error('touch the end line');
-						}
-						row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-							if (colNumber >= firstDataColumn) {
-								var val = cell.value;
-								if (val) {
-									var line = {
-										"機種": item,
-										"販社": row.getCell('販社').text,
-										"仕向地": row.getCell('仕向地').text,
-										"PSI": row.getCell('PSI').text,
-										"日期": cols[colNumber],
-										"数量": val
-									};
-									csvDatas.push(line);
-								}
-							}
-						});
-					}
-				});
-			} catch (e) {}
-
-			var BOM = '\uFEFF';
-			var buff = Papa.unparse(csvDatas);
-			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
-			saveAs(blob, "文件导出测试3.csv");
-		}).catch(function(error) {
-			alert(error.message);
-		});
+	var params = {
+		"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
+		"common_head_types": ["string", "string", "string", "string", "string"],
+		"loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
+		"level": 1, "loop_levels": [
+			{"row": 1, "loop_col_starts": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
+		]
 	};
+	excelUtility.parseLongToShort(fileObj, params)
+		.then(function(datas) {
+			csvUtility.saveCsv(datas.details, "文件导出测试3.csv");
+		}).catch(function(message) {
+			alert(message);
+		});
 });
 
 $j('#transform2').click(function() {
@@ -1308,6 +1167,7 @@ $j('#transform2Input').change(function() {
 									"機種": item,
 									"販社": row.getCell('販社').text,
 									"仕向地": row.getCell('仕向地').text,
+									"仕向港": row.getCell('仕向港').text,
 									"PSI": row.getCell('PSI').text,
 									"日期": cols[colNumber],
 									"数量": val
@@ -1319,10 +1179,7 @@ $j('#transform2Input').change(function() {
 				});
 			} catch (e) {}
 
-			var BOM = '\uFEFF';
-			var buff = Papa.unparse(csvDatas);
-			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
-			saveAs(blob, "文件导出测试5.csv");
+			csvUtility.saveCsv(csvDatas, "文件导出测试5.csv");
 		}).catch(function(error) {
 			alert(error.message);
 		});
@@ -1365,139 +1222,6 @@ $j('#get_date').click(function() {
 	alert(dt.getDisplayValue());
 });
 
-// //解析CSV文件
-// var parseNormalCsv = function(fileObj, htmlObj) {
-// 	gel(htmlObj).value = "";
-// 	Papa.parse(fileObj, {
-// 		complete: function(results) {
-// 			// gel(htmlObj).value = JSON.stringify(results.data);
-// 			var datas = results.data;
-// 			var errors = results.errors;
-// 			if (errors.length > 0) {
-// 				alert("文件格式异常：" + JSON.stringify(errors));
-// 				return;
-// 			}
-// 			if (datas.length < 1) {
-// 				alert("没有数据");
-// 				return;
-// 			}
-// 			var rowno_name = "sys_import_row";
-// 			var cols = [rowno_name];
-// 			var csvDatas = [];
-// 			var ret = {};
-// 			// alert("开始解析");
-// 			for(var i = 0; i < datas.length; i++) {
-// 				var data = datas[i];
-// 				if (i == 0) { //获取表头
-// 					for (var j = 0; j < data.length; j++) {
-// 						var v = data[j];
-// 						if (v == "") {
-// 							v = String(j + 1);
-// 						}
-// 						cols.push("u_" + v.toLowerCase().replaceAll(" ", "_"));
-// 					}
-// 					// alert("获取表头：" + JSON.stringify(cols));
-// 				} else { //获取数据
-// 					//cols因为增加了一个行号列，所以比数据列多一列
-// 					if (data.length != (cols.length-1)) {
-// 						//列数不一致
-// 						// alert("列数不一致，data.length=" + data.length);
-// 						continue;
-// 					}
-// 					var line = {"sys_import_row": i};
-// 					var isBlankLine = true;
-// 					for (var k = 0; k < data.length; k++) {
-// 						var colName = cols[k+1];
-// 						var colValue = data[k];
-// 						if (colValue) {
-// 							isBlankLine = false;
-// 						}
-// 						line[colName] = colValue;
-// 					}
-// 					// alert("获取数据：" + JSON.stringify(line));
-// 					if (!isBlankLine) {
-// 						csvDatas.push(line);
-// 					}
-// 				}
-// 			}
-// 			ret["heads"] = cols;
-// 			ret["details"] = csvDatas;
-// 			gel(htmlObj).value = JSON.stringify(ret);
-// 		}
-// 	});
-// };
-
-// //解析Excel文件
-// var parseNormalExcel = function(fileObj, htmlObj) {
-// 	gel(htmlObj).value = "";
-// 	getLocalFile(fileObj, 'arraybuffer').then(function(reader) {
-// 		var workbook = new ExcelJS.Workbook();
-
-// 		workbook.xlsx.load(reader.result).then(function(data) {
-// 			worksheet = workbook.getWorksheet(1);
-
-// 			var firstDataLine = 2;
-// 			//行号列的列名
-// 			var rowno_name = "sys_import_row";
-// 			var datas = {};
-// 			var dbHeads = [];
-// 			//第一列设置行号
-// 			var cols = [rowno_name];
-// 			var csvDatas = [];
-// 			//获取表头
-// 			var headRow = worksheet.getRow(1);
-// 			headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-// 				cols.push(utility.transformString(cell.value));
-// 			});
-// 			dbHeads = cols.map(function(v, index) {
-// 				if (v == "") {
-// 					v = String(index);
-// 				}
-// 				//第一列行号不变换
-// 				if (index == 0) {
-// 					return v;
-// 				} else {
-// 					return "u_" + v.toLowerCase().replaceAll(" ", "_");
-// 				}
-// 			});
-// 			//设置表头
-// 			for (i = 1, len = dbHeads.length; i < len; i++) {
-// 				worksheet.getColumn(i).key = dbHeads[i];
-// 			}
-// 			//获取数据
-// 			try {
-// 				worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-// 					if (rowNumber >= firstDataLine) {
-// 						var rowValues = {"sys_import_row": rowNumber};
-// 						var isBlankRow = true;
-// 						//循环列的数据
-// 						for (var i = 1; i < dbHeads.length; i++) {
-// 							var colItem = dbHeads[i];
-// 							var itemValue = row.getCell(colItem).text;
-// 							if (itemValue) {
-// 								isBlankRow = false;
-// 							}
-// 							rowValues[colItem] = itemValue;
-// 						}
-// 						//非空白行的时候加入
-// 						if (!isBlankRow) {
-// 							csvDatas.push(rowValues);
-// 						}
-// 					}
-// 				});
-// 				datas["heads"] = dbHeads;
-// 				datas["details"] = csvDatas;
-// 				gel(htmlObj).value = JSON.stringify(datas);
-// 			} catch (e) {
-// 				alert(e.message);
-// 			}
-
-// 		}).catch(function(error) {
-// 			alert(error.message);
-// 		});
-// 	});
-// };
-
 $j('#uploadFile').change(function() {
 	var name = $j('#uploadFile').prop('value');
 	//未选文件的时候不处理
@@ -1505,7 +1229,7 @@ $j('#uploadFile').change(function() {
 		return;
 	}
 	var fileObj = $j('#uploadFile').prop('files')[0];
-	getLocalFile(fileObj, 'dataURL').then(function(reader) {
+	utility.getLocalFile(fileObj, 'dataURL').then(function(reader) {
 		gel('uploadFileName').value = reader.filename;
 		gel('upd').value = reader.result;
 		//gel('uploadFileType').value = reader.filetype;
@@ -1523,31 +1247,14 @@ $j('#uploadFile').change(function() {
 				});
 		} else {
 			gel('uploadFileType').value = "Excel";
-			//解析Excel内容，保存到upd2
-			//parseNormalExcel(fileObj, "upd2");
-			// excelUtility.parseNormalExcel(fileObj, true)
-			// 	.then(function(datas) {
-			// 		gel('upd2').value = JSON.stringify(datas);
-			// 	}).catch(function(message) {
-			// 		alert(message);
-			// 		gel('upd2').value = "";
-			// 	});
-			var params = {
-				"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
-				"common_head_types": ["string", "string", "string", "string", "string"],
-				"loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
-				"level": 1, "loop_levels": [
-					{"row": 1, "loop_col_starts": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
-				]
-			};
-			excelUtility.parseLongToShort(fileObj, params)
+			// 解析Excel内容，保存到upd2
+			// parseNormalExcel(fileObj, "upd2");
+			// var params = ["string", "string", "formula", "string", "number", "number", "number", "number"];
+			var params = ["string", "string", "string", "string", "number", "number", "number", "number"];
+			excelUtility.parseNormalExcel(fileObj, params, true)
 				.then(function(datas) {
 					gel('upd2').value = JSON.stringify(datas);
 					alert("get " + datas.details.length + " data lines");
-					// var BOM = '\uFEFF';
-					// var buff = Papa.unparse(datas.details);
-					// var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
-					// saveAs(blob, "文件导出测试4.csv");
 				}).catch(function(message) {
 					alert(message);
 					gel('upd2').value = "";
@@ -1628,7 +1335,8 @@ $j('#uploadFile').change(function() {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<!-- <g:requires name="Utility.jsdbx"/> -->
 	<g:evaluate object="true">
-		var uiscripts = ["x_58872_needit.Utility", "x_58872_needit.CsvUtility", "x_58872_needit.ExcelUtility"];
+		var uiscripts = ["x_58872_needit.Utility", "x_58872_needit.CsvUtility", 
+			"x_58872_needit.ExcelUtility", "x_58872_needit.AxiosUtility"];
 		var jslibs = [];
 		for (var key in uiscripts) {
 			var gr = new GlideRecordSecure('sys_ui_script');	
@@ -1927,13 +1635,13 @@ response.sendRedirect(encodeURI("sys_import_set_list.do"));
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-14 03:12:55</sys_created_on>
         <sys_id>6d4c0e9793020210868ab4de3bba101b</sys_id>
-        <sys_mod_count>1093</sys_mod_count>
+        <sys_mod_count>1113</sys_mod_count>
         <sys_name>sample_page</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_6d4c0e9793020210868ab4de3bba101b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-10 09:34:08</sys_updated_on>
+        <sys_updated_on>2024-07-11 10:01:31</sys_updated_on>
     </sys_ui_page>
 </record_update>

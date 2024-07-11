@@ -17,6 +17,28 @@ x_58872_needit.Utility = (function() {
 		return ++privateVar;
 	}
 */
+	var reader_err_message = ["0: UNKNOW", 
+		"1: NOT_FOUND_ERR", "2: SECURITY_ERR", "3: ABORT_ERR", 
+		"4: NOT_READABLE_ERR", "5: ENCODING_ERR"];
+
+	function dateToString(obj) {
+		if (obj) {
+			if (typeof obj == "string") {
+				return obj;
+			} else {
+				try {
+					var Y = obj.getFullYear();
+					var M = obj.getMonth() + 1;
+					var D = obj.getDate();
+					return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
+				} catch(ex) {
+					return obj.toString();
+				}
+			}
+		} else {
+			return '';
+		}
+	}
 
 /* Share variables between multiple UI scripts by adding them to your scope object. For example: 
 	x_58872_needit.sharedVar = 0; 
@@ -48,30 +70,15 @@ x_58872_needit.Utility = (function() {
 						buff = buff + richText[i]["text"];
 					}
 					return buff;
+				} else if ("result" in obj) {
+					return obj.result;
+				} else if ("getDate" in obj) {
+					return dateToString(obj);
 				} else {
-					return this.dateToString(obj);
+					return obj.toString();
 				}
 			} else {
 				return obj.toString();
-			}
-		},
-
-		dateToString: function(obj) {
-			if (obj) {
-				if (typeof obj == "string") {
-					return obj;
-				} else {
-					try {
-						var Y = obj.getFullYear();
-						var M = obj.getMonth() + 1;
-						var D = obj.getDate();
-						return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
-					} catch(ex) {
-						return obj.toString();
-					}
-				}
-			} else {
-				return '';
 			}
 		},
 
@@ -99,6 +106,7 @@ x_58872_needit.Utility = (function() {
 			}
 		},
 		
+		//改变object中指定字段的类型
 		typeTransform: function(obj, item, type) {
 			var itemValue = obj[item];
 			if (type == "int") {
@@ -114,6 +122,7 @@ x_58872_needit.Utility = (function() {
 
 		// getLocalFile函数：通过FileReader读取本地文件并返回结果给Promise
 		// type: 可以指定的文件类型有'text'，'arraybuffer'，'dataURL'，'binaryString'
+		// return: Promise，成功值（reader），失败值（失败原因）
 		getLocalFile: function(fileObj, type) {
 			return new Promise(function(resolve, reject) {
 				var reader = new FileReader();
@@ -123,7 +132,12 @@ x_58872_needit.Utility = (function() {
 					resolve(e.target);
 				};
 				reader.onerror = function(e) {
-					reject(e.target);
+					var errCode = e.target.error.code;
+					if (errCode >= reader_err_message.length) {
+						reject(errCode + ": UNKNOW");
+					} else {
+						reject(reader_err_message[errCode]);
+					}
 				};
 				if (type == "arraybuffer") {
 					/* read excel */
@@ -138,6 +152,33 @@ x_58872_needit.Utility = (function() {
 				}
 			});
 		},
+
+		// 从指定Ajax函数返回结果给Promise
+		// url: 调用Ajax的名称
+		// functionName: Ajax里的函数名（该函数必须返回带result和message属性的object类型的变量）
+		// params: 传递给function的参数，可选
+		// return: Promise，成功值（Ajax的执行结果和取得值），失败值（失败原因）
+		getAjax: function(url, functionName, params) {
+			//设定默认params为空
+			if (typeof params == 'undefined' || params == null) {
+				params = {};
+			}
+			return new Promise(function(resolve, reject) {
+				var ga = new GlideAjax(url);
+				ga.addParam('sysparm_name', functionName);
+				for (var key in params) {
+					ga.addParam('sysparm_' + key, params[key]);
+				}
+				ga.getXMLAnswer(function(answer) {
+					var jsonObj = JSON.parse(answer);
+					if (jsonObj.result == "ok") {
+						resolve(jsonObj);
+					} else {
+						reject(jsonObj.message);
+					}
+				});
+			});
+		}, 
 		
 		type:  "Utility"
 	};
@@ -148,14 +189,14 @@ x_58872_needit.Utility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-06-27 07:43:27</sys_created_on>
         <sys_id>3abd21e193c74210868ab4de3bba10c7</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>5</sys_mod_count>
         <sys_name>x_58872_needit.Utility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_3abd21e193c74210868ab4de3bba10c7</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-03 08:56:38</sys_updated_on>
+        <sys_updated_on>2024-07-11 08:14:37</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>

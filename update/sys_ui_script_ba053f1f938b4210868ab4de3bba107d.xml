@@ -7,7 +7,8 @@
         <name>x_58872_needit.CsvUtility</name>
         <script><![CDATA[var x_58872_needit = x_58872_needit || {};
 
-// 需要引入Csv解析的外部js(PapaParse)
+// 需要引入Csv解析的外部js(PapaParse, FileSaver)
+// PapaParse的设定参照官网https://www.papaparse.com/#local-files
 x_58872_needit.CsvUtility = (function() {
 	"use strict";
 
@@ -53,11 +54,20 @@ x_58872_needit.CsvUtility = (function() {
 			return private_function();
 		},
 */
+		//保存csv的文件
+		//return: 无
+		saveCsv: function(csvDatas, fileName) {
+			var BOM = '\uFEFF';
+			var buff = Papa.unparse(csvDatas);
+			var blob = new Blob([BOM + buff], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, fileName);
+		},
 
 		//解析CSV文件
 		//isToDbColumnName: 是否把title行的列名转换成db名
 		//hasHead: 是否有title行
 		//headRowNo: title行的序号，从0开始
+		//return: Promise，成功值（解析内容的object对象），失败值（失败原因）
 		parseNormalCsv: function(fileObj, isToDbColumnName, hasHead, headRowNo) {
 			if (typeof isToDbColumnName == "undefined") {
 				isToDbColumnName = false;
@@ -175,14 +185,14 @@ x_58872_needit.CsvUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 03:50:56</sys_created_on>
         <sys_id>ba053f1f938b4210868ab4de3bba107d</sys_id>
-        <sys_mod_count>16</sys_mod_count>
+        <sys_mod_count>18</sys_mod_count>
         <sys_name>x_58872_needit.CsvUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_ba053f1f938b4210868ab4de3bba107d</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-08 03:53:35</sys_updated_on>
+        <sys_updated_on>2024-07-11 05:15:49</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>
