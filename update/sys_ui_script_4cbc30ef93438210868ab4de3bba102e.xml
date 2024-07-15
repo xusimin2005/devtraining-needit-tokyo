@@ -172,16 +172,33 @@ x_58872_needit.ExcelUtility = (function() {
 
 		//根据arraybuffer构成Excel的Workbook
 		//return: Promise，成功值（workbook），失败值（失败原因）
-		createExcelWorkbook: function (arraybuffer) {
+		createWorkbookWithTemplate: function (arraybuffer) {
 			return new Promise(function(resolve, reject) {
-				var workbook = new ExcelJS.Workbook();
-				workbook.xlsx.load(arraybuffer).then(function() {
-					resolve(workbook);
-				}).catch(function(error) {
-					workbook = null;
-					reject(error.message);
-				}); //end of workbook.xlsx.load
+				try {
+					var workbook = new ExcelJS.Workbook();
+					workbook.xlsx.load(arraybuffer).then(function() {
+						resolve(workbook);
+					}).catch(function(error) {
+						workbook = null;
+						reject(error.message);
+					}); //end of workbook.xlsx.load
+				} catch(ex) {
+					reject(ex.message);
+				}
 
+			}); //end of new Promise
+		},
+
+		//构成空白的Excel的Workbook
+		//return: Promise，成功值（workbook），失败值（失败原因）
+		createBlankWorkbook: function () {
+			return new Promise(function(resolve, reject) {
+				try {
+					var workbook = new ExcelJS.Workbook();
+					resolve(workbook);
+				} catch(ex) {
+					reject(ex.message);
+				}
 			}); //end of new Promise
 		},
 
@@ -592,14 +609,14 @@ x_58872_needit.ExcelUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 09:01:34</sys_created_on>
         <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
-        <sys_mod_count>60</sys_mod_count>
+        <sys_mod_count>63</sys_mod_count>
         <sys_name>x_58872_needit.ExcelUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-12 10:06:17</sys_updated_on>
+        <sys_updated_on>2024-07-15 07:52:42</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>

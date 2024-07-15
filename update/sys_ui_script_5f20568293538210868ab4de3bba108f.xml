@@ -61,6 +61,12 @@ x_58872_needit.AxiosUtility = (function() {
 			return getFile(url, 'arraybuffer');
 		},
 
+		//获得Json文件
+		//return: Promise，成功值（Json对象），失败值（失败原因）
+		getJsonFile: function(url) {
+			return getFile(url, 'json');
+		},
+
 		type:  "AxiosUtility"
 	};
 })();
@@ -70,14 +76,14 @@ x_58872_needit.AxiosUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-11 09:31:24</sys_created_on>
         <sys_id>5f20568293538210868ab4de3bba108f</sys_id>
-        <sys_mod_count>4</sys_mod_count>
+        <sys_mod_count>5</sys_mod_count>
         <sys_name>x_58872_needit.AxiosUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_5f20568293538210868ab4de3bba108f</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-11 10:06:46</sys_updated_on>
+        <sys_updated_on>2024-07-15 05:07:15</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>
