@@ -99,6 +99,13 @@ x_58872_needit.ExcelUtility = (function() {
 			}
 		} else if (type === "date") {
 			return dateToString(cell.value);
+		} else if (type === "result") {
+			var r = cell.result;
+			if (typeof r == "object") {
+				return null;
+			} else {
+				return r;
+			}
 		} else if (type === "formula") {
 			return cell.formula;
 		} else {
@@ -106,60 +113,140 @@ x_58872_needit.ExcelUtility = (function() {
 		}
 	}
 
-	//添加出力行表头字段
-	function addCsvColumn(csv_cols, param_heads, isToDbColumnName) {
-		for (var j = 0; j < param_heads.length; j++) {
-			if (isToDbColumnName) {
-				csv_cols.push(toDbColumnName(param_heads[j]));
-			} else {
-				csv_cols.push(param_heads[j]);
-			}
-		}
-	}
-
-	//添加标题行的字段值到map，并把标题字段添加到表头字段
-	function addCsvLevel(csv_cols, csv_levels, loopLevel, csvGroups, isToDbColumnName) {
-		var level_titles = loopLevel.level_titles;
-		var csvLevel = {"level_titles": level_titles, "level_values": csvGroups};
-		csv_levels.push(csvLevel); //csv_levels按level保存多个分组的level_titles的值
-		addCsvColumn(csv_cols, level_titles, isToDbColumnName);
-	}
-
-	//获取Title的值，并把它按group map保存到各个group中
-	function addTitleValue(cell, csvGroups, loopLevel, titleIdx, group, group2) {
+	//获取某个单元格Level Title的值，并保存到相应的csvGroups对象中
+	function getCellTitleValue(cell, csvGroups, loopLevel, titleIdx, group, group2) {
+		if (loopLevel == null) return; 
+		
 		var loop_col_starts = loopLevel.loop_col_starts;
 		var level_titles = loopLevel.level_titles;
 		var level_title_types = loopLevel.level_title_types;
 		var groupName = null, csvTitles = null;
+
 		if (typeof group2 == "undefined" || group2 == null) {
 			groupName = String(group);
 		} else {
 			groupName = String(group2) + " " + String(group);
 		}
+
 		if (csvGroups.hasOwnProperty(groupName)) {
 			csvTitles = csvGroups[groupName];
 		} else {
 			csvTitles = {}; //csvTitles包含一组level_titles
 			csvGroups[groupName] = csvTitles; //csvGroups按分组号保存level_titles
 		}
-
+		
 		for (var j = 0; j < loop_col_starts.length; j++) {
 			if (titleIdx == loop_col_starts[j]) { //需要保存title
-				var level_title = level_titles[j];
-				csvTitles[level_title] = getCellValue(cell, level_title_types[j]);
+				csvTitles[level_titles[j]] = getCellValue(cell, level_title_types[j]);
 				break;
 			}
 		} // end of one title process
 	}
 
-	//比较当前行是否是title行
-	function checkLevel(row_no, loop_levels) {
+	//检查当前行是否是Level Title行，如果是，返回loop_level，否则返回null
+	function findLevel(rowNo, loop_levels) {
+		if (loop_levels == null) return null;
+
 		for (var j = 0; j < loop_levels.length; j++) {
-			if (loop_levels[j].row == row_no) {
+			if (loop_levels[j].row == rowNo) {
 				return loop_levels[j];
 			}
 		}
 		return null;
+	}
+
+	//追加Head一览到col列中
+	function appendHeads(cols, loop_heads, isToDbColumnName) {
+		if (loop_heads == null) return;
+
+		for (var j = 0; j < loop_heads.length; j++) { 
+			var loop_head = loop_heads[j];
+			if (isToDbColumnName) {
+				cols.push(toDbColumnName(loop_head));
+			} else {
+				cols.push(loop_head);
+			}
+		}
+	}
+
+	//追加Level到col列和Level一览中
+	function appendLevel(cols, csvLevels, loopLevel, csvGroups, isToDbColumnName) {
+		if (loopLevel == null) return;
+
+		var level_titles = loopLevel.level_titles;
+		var csvLevel = {"level_titles": level_titles, "level_values": csvGroups};
+		csvLevels.push(csvLevel); //csvLevels按level保存多个分组的level_titles的值
+
+		//添加csvLevel列
+		appendHeads(cols, level_titles, isToDbColumnName);
+	}
+
+	//添加一行数据
+	function appendDataLine(csvDatas, row, row_no, common_heads, common_head_types, loop_col_count, loop_heads, loop_head_types, csvLevels, 
+				cols, loop_group_col_count, group, group2) {
+		var isBlankGroup = true;
+		var groupValues = [];
+		var j = 0, k = 0;
+		var colName = null, groupName = null, val = null;
+		if (typeof group2 == "undefined" || group2 == null) {
+			groupName = String(group);
+		} else {
+			groupName = String(group2) + " " + String(group);
+		}
+
+		//获取Group的值
+		for (j = 0; j < loop_group_col_count; j++) {
+			colName = loop_heads[j] + " " + groupName; //headName+空格+group号
+			val = getCellValue(row.getCell(colName), loop_head_types[j]);
+			if (val) {
+				isBlankGroup = false;
+			}
+			groupValues.push(val);
+		}
+
+		if (!isBlankGroup) {
+			var line = {};
+			line["row_no"] = row_no;
+			var columnIdx = 0;
+			
+			//common_heads
+			for(j = 0; j < common_heads.length; j++) {
+				colName = common_heads[j];
+				line[cols[columnIdx]] = getCellValue(row.getCell(colName), common_head_types[j]);
+				columnIdx++;
+			}
+
+			//level_titles（level数可以大于1，每个level都可以有多个group，每个group又有一组title）
+			for (j = 0; j < csvLevels.length; j++) {
+				var csvLevel = csvLevels[j]; //csvLevels[j]对应level，String(group)对应group，titles对应group下的分组level_titles
+				var level_titles = csvLevel.level_titles;
+				var level_values = csvLevel.level_values;
+
+				var level_group = level_values[groupName];
+				for (k = 0; k < level_titles.length; k++) {
+					var level_group_title = level_titles[k];
+					if (level_group.hasOwnProperty(level_group_title)) {
+						line[cols[columnIdx]] = level_group[level_group_title];
+					} else {
+						line[cols[columnIdx]] = null;
+					}
+					columnIdx++;
+				}
+			}
+
+			//loop_value
+			for (j = 0; j < loop_group_col_count; j++) {
+				line[cols[columnIdx]] = groupValues[j];
+				columnIdx++;
+			}
+			//如果数据不完整，补足缺失的数据字段
+			for (j = loop_group_col_count; j < loop_col_count; j++) {
+				line[cols[columnIdx]] = null;
+				columnIdx++;
+			}
+
+			csvDatas.push(line);
+		} // end of one group
 	}
 
 	// getLocalFile函数：通过FileReader读取本地文件并返回结果给Promise
@@ -413,7 +500,7 @@ x_58872_needit.ExcelUtility = (function() {
 		// "common_head_types": ["string", "string", "string", "string", "string"],
 		// "loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
 		// "level": 1, "loop_levels": [
-		// 	{"row": 1, "loop_col_starts": [1], "loop_col_spans": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
+		// 	{"row": 1, "loop_col_starts": [1], "col_spans": [1], "level_titles": ["日期"], "level_title_types": ["date"]}
 		// ]
 		// }
 		//isToDbColumnName: 是否把title行的列名转换成db名
@@ -440,7 +527,7 @@ x_58872_needit.ExcelUtility = (function() {
 					var csvLevels = [];
 					var ret = {};
 					var i = 0, j = 0, k = 0;
-					var group = 0, titleIdx = 0, diff = 0, mod = 0, max_col_group = 0, last_group_cols = 0;
+					var diff = 0, group = 0, mod = 0, titleIdx = 0, max_col_group = 0, last_group_cols = 0;
 					var key = "";
 
 					try {
@@ -457,20 +544,27 @@ x_58872_needit.ExcelUtility = (function() {
 						var headRow = null;
 						var loopLevel = null;
 						var processTitle = false;
+
+						//先保留共通部分，分别设到cols_with_group（excel的列别名）和cols（json数据的字段名）
 						cols_with_group.push.apply(cols_with_group, common_heads);
-						//1.保留共通部分的title到cols
-						addCsvColumn(cols, common_heads, isToDbColumnName);
+						for (i = 0; i < common_heads.length; i++) {
+							if (isToDbColumnName) {
+								cols.push(toDbColumnName(common_heads[i]));
+							} else {
+								cols.push(common_heads[i]);
+							}
+						}
 
 						for (i = 1; i <= headRowNo; i++) {
-							
+							processTitle = false;
 							//检查是否是需要保留值的title行
-							loopLevel = checkLevel(i, loop_levels);
-							if (loopLevel == null) {
-								processTitle = false;
-							} else {
-								processTitle = true;
+							for (j = 0; j < loop_levels.length; j++) {
+								if (loop_levels[j].row == i) {
+									loopLevel = loop_levels[j];
+									processTitle = true;
+									break;
+								}
 							}
-
 							//如果是需要保存值的标题行或者是标题行的最后一行
 							if (processTitle || i == headRowNo) {
 								headRow = worksheet.getRow(i);
@@ -478,7 +572,7 @@ x_58872_needit.ExcelUtility = (function() {
 								continue;
 							}
 							
-							var csvGroups = {};
+							var csvTitles = {}, csvGroups = {};
 							headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
 								diff = colNumber - common_heads.length;
 								group = Math.ceil(diff / loop_col_count);
@@ -490,10 +584,24 @@ x_58872_needit.ExcelUtility = (function() {
 								}
 
 								//处理title行
-								if (processTitle && colNumber > common_heads.length) {
-									addTitleValue(cell, csvGroups, loopLevel, titleIdx, group, null);
+								var loop_col_starts = null, level_titles = null, level_title_types = null, level_title = null;
+								if (processTitle) {
+									loop_col_starts = loopLevel.loop_col_starts;
+									level_titles = loopLevel.level_titles;
+									level_title_types = loopLevel.level_title_types;
+									for(j = 0; j < loop_col_starts.length; j++) {
+										if (titleIdx == loop_col_starts[j]) { //需要保存title
+											if (titleIdx == 1) { //每个group的首列
+												csvTitles = {}; //csvTitles包含一组level_titles
+												csvGroups[String(group)] = csvTitles; //csvGroups按分组号保存level_titles
+											}
+											level_title = level_titles[j];
+											csvTitles[level_title] = getCellValue(cell, level_title_types[j]);
+											break;
+										}
+									} // end of one title process
 								}
-								
+
 								//处理head行
 								if (i == headRowNo && colNumber > common_heads.length) {
 									var loop_head = loop_heads[titleIdx - 1];
@@ -504,15 +612,38 @@ x_58872_needit.ExcelUtility = (function() {
 							}); // end of headRow.eachCell
 
 							if (processTitle) { //保存处理的title行
-								//2.保留level部分的title到cols，同时把level部分的值保留到csvLevels
-								addCsvLevel(cols, csvLevels, loopLevel, csvGroups, isToDbColumnName);
+								var level_titles = loopLevel.level_titles;
+								var csvLevel = {"level_titles": level_titles, "level_values": csvGroups};
+								csvLevels.push(csvLevel); //csvLevels按level保存多个分组的level_titles的值
+								// //保存第一个分组的所有列名
+								// for (key in csvGroups["1"]) { 
+								// 	if (isToDbColumnName) {
+								// 		cols.push(toDbColumnName(key));
+								// 	} else {
+								// 		cols.push(key);
+								// 	}
+								// }
+								for (j = 0; j < level_titles.length; j++) {
+									if (isToDbColumnName) {
+										cols.push(toDbColumnName(level_titles[j]));
+									} else {
+										cols.push(level_titles[j]);
+									}
+								}
 							}
 
 							if (i == headRowNo) { //保存loop的最大group数和loop_heads的列名
 								max_col_group = group;
 								last_group_cols = titleIdx;
-								//3.保留loop_heads部分的title到cols
-								addCsvColumn(cols, loop_heads, isToDbColumnName);
+								//保存loop_heads的所有列名
+								for (j = 0; j < loop_heads.length; j++) { 
+									var loop_head = loop_heads[j];
+									if (isToDbColumnName) {
+										cols.push(toDbColumnName(loop_head));
+									} else {
+										cols.push(loop_head);
+									}
+								}
 							}
 
 						} // end of headRowNo loop
@@ -522,17 +653,18 @@ x_58872_needit.ExcelUtility = (function() {
 							worksheet.getColumn(i+1).key = cols_with_group[i];
 						}
 
+						var colName = "";
+						var isBlankGroup = true;
+						var groupValues = [];
+						var columnIdx = 0;
+						var loop_group_col_count = 0;
+
 						//获取数据
 						worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
 							if (rowNumber >= firstDataLine) {
-								var colName = "";
-								var isBlankGroup = true;
-								var groupValues = {};
-								var columnIdx = 0;
-								var loop_group_col_count = 0;
 								
 								//循环列的数据
-								for (group = 1; group <= max_col_group; group++) {
+								for (var group = 1; group <= max_col_group; group++) {
 									isBlankGroup = true;
 									groupValues = [];
 
@@ -564,18 +696,23 @@ x_58872_needit.ExcelUtility = (function() {
 										}
 
 										//level_titles（level数可以大于1，每个level都可以有多个group，每个group又有一组title）
-										for (j = 0; j < csvLevels.length; j++) {
+										for(j = 0; j < csvLevels.length; j++) {
 											var csvLevel = csvLevels[j]; //csvLevels[j]对应level，String(group)对应group，titles对应group下的分组level_titles
 											var level_titles = csvLevel.level_titles;
 											var level_values = csvLevel.level_values;
 
 											var level_group = level_values[String(group)];
+											// var key = ""; //key对应group下每组title名称
+											// for(key in level_group) { 
+											// 	line[cols[columnIdx]] = level_group[key];
+											// 	columnIdx++;
+											// }
 											for (k = 0; k < level_titles.length; k++) {
-												var level_group_title = level_titles[k];
-												if (level_group.hasOwnProperty(level_group_title)) {
-													line[cols[columnIdx]] = level_group[level_group_title];
-												} else {
+												var level_group_value = level_group[level_titles[k]];
+												if (typeof level_group_value == "undefined") {
 													line[cols[columnIdx]] = null;
+												} else {
+													line[cols[columnIdx]] = level_group[level_titles[k]];
 												}
 												columnIdx++;
 											}
@@ -595,7 +732,7 @@ x_58872_needit.ExcelUtility = (function() {
 										csvDatas.push(line);
 									} // end of one group
 
-								} // end of group loop, one line
+								} // end of one line
 								
 							} // end of all data line
 						});
@@ -603,6 +740,294 @@ x_58872_needit.ExcelUtility = (function() {
 
 						ret["heads"] = cols;
 						ret["details"] = csvDatas;
+						resolve(ret);
+					} catch (e) {
+						workbook = null;
+						// alert(e.message);
+						reject(e.message);
+					}
+
+				}); //end of new Promise
+
+			}); //end of getLocalExcel
+		},
+
+		//解析Excel文件，从长的行转化为短的行，2层循环结构
+		//params: 定义长短转换的规则，参照如下方法设定
+		// {
+			// "level": 9, 
+			// "common_heads": ["No", "FGLmodelname", "Salesmodelname", "Factroy", "E", "Category", "I/O", "H", "COGS", "J", "Index", "Con Pro", "Arg Chk", "Rep Model", "SMS", "Last On Hand", "Last OTW OH"], 
+			// "common_head_types": ["number", "string", "string", "string", "string", "string", "string", "string", "number", "string", "number", "string", "string", "string", "string", "number", "number"],
+			// "loop1_col_count": 15, 
+			// "loop1_heads": ["Shipped", "Production", "P Revised FG XX", "P Revised HQ", "P TTL", "Internal Transaction", "Comment", "Forecast", "Ordered", "S Revised", "S TTL", "On Hand", "OTW", "OTW OH", "INDEX I TTL"], 
+			// "loop1_head_types": ["number", "number", "number", "number", "result", "number", "number", "number", "number", "number", "result", "number", "number", "result", "result"], 
+			// "loop2_col_count": 63, "loop2_col_skips": 60, 
+			// "loop2_heads": ["P", "S", "I"], 
+			// "loop2_head_types": ["result", "result", "result"], 
+			// "loop1_levels": [
+			// 	{"row": 1, "loop_col_starts": [1], "col_spans": [15], 
+			// 	"level_titles": ["Date"], "level_title_types": ["date"]}
+			// ], 
+			// "loop2_levels": [
+			// 	{"row": 1, "loop_col_starts": [1], "col_spans": [3], 
+			// 	"level_titles": ["Date"], "level_title_types": ["string"]}
+			// ]
+		// }
+		//isToDbColumnName: 是否把title行的列名转换成db名
+		//sheetNo: sheet的序号，从1开始
+		//hasFixedHead: 是否包含固定标题列
+		//return: Promise，成功值（解析内容的object对象），失败值（失败原因）
+		parseLongToShort2: function(fileObj, params, isToDbColumnName, sheetNo, hasFixedHead) {
+			if (typeof isToDbColumnName == "undefined") {
+				isToDbColumnName = false;
+			}
+			if (typeof sheetNo == "undefined") {
+				sheetNo = 1;
+			}
+			if (typeof hasFixedHead == "undefined") {
+				hasFixedHead = false;
+			}
+			return this.getLocalExcel(fileObj).then(function(workbook) {
+				return new Promise(function(resolve, reject) {
+					var worksheet = workbook.getWorksheet(sheetNo);
+					if (typeof worksheet == "undefined") {
+						worksheet = workbook.worksheets[0];
+						sheetNo = worksheet.id;
+					}
+
+					var cols = [], loop2_cols = [], fixed_cols = [];
+					var cols_with_group = [];
+					var csvDatas = [], csvLoop2Datas = [], csvFixedDatas = [];
+					var csvLevels = [], csvLoop2Levels = [], csvFixedLevels = [];
+					var ret = {};
+					var i = 0;
+					var max_col_group = 0, last_group_cols = 0;
+					var diff = 0, group = 0, mod = 0, titleIdx = 0;
+					var group2 = 0, mod2 = 0;
+
+					try {
+						var headRowNo = params.level;
+						var firstDataLine = headRowNo + 1;
+						var common_heads = params.common_heads;
+						var common_head_types = params.common_head_types;
+
+						var loop1_col_count = params.loop1_col_count;
+						var loop1_heads = params.loop1_heads;
+						var loop1_head_types = params.loop1_head_types;
+						var loop1_levels = params.loop1_levels;
+
+						var loop2_col_count = params.loop2_col_count;
+						var loop2_col_skips = params.loop2_col_skips;
+						var loop2_heads = params.loop2_heads;
+						var loop2_head_types = params.loop2_head_types;
+						var loop2_levels = params.loop2_levels;
+
+						//动态设置fixed_title
+						var fixed_head_count = 0, fixed_heads = null, fixed_head_types = null, fixed_head_levels = null;
+						if (hasFixedHead) {
+							fixed_head_count = params.fixed_head_count;
+							fixed_heads = params.fixed_heads;
+							fixed_head_types = params.fixed_head_types;
+							fixed_head_levels = params.fixed_head_levels;
+						}
+						
+						//获取表头
+						var headRow = null;
+						var loop1Level = null, loop2Level = null, fixedLevel = null;
+						var processLoop1LevelTitle = false, processLoop2LevelTitle = false, processFixedLevelTitle = false;
+
+						//先保留共通部分，分别设到cols_with_group（excel的列别名）和cols（json数据的字段名）
+						cols_with_group.push.apply(cols_with_group, common_heads);
+						appendHeads(cols, common_heads, isToDbColumnName);
+						appendHeads(loop2_cols, common_heads, isToDbColumnName);
+						appendHeads(fixed_cols, common_heads, isToDbColumnName);
+
+						for (i = 1; i <= headRowNo; i++) {
+							//检查是否是需要保留值的title行
+							fixedLevel = findLevel(i, fixed_head_levels);
+							if (fixedLevel == null) {
+								processFixedLevelTitle = false;
+							} else {
+								processFixedLevelTitle = true;
+							}
+
+							loop1Level = findLevel(i, loop1_levels);
+							if (loop1Level == null) {
+								processLoop1LevelTitle = false;
+							} else {
+								processLoop1LevelTitle = true;
+							}
+
+							loop2Level = findLevel(i, loop2_levels);
+							if (loop2Level == null) {
+								processLoop2LevelTitle = false;
+							} else {
+								processLoop2LevelTitle = true;
+							}
+
+							//如果是需要保存值的标题行或者是标题行的最后一行
+							if (processFixedLevelTitle || processLoop1LevelTitle || processLoop2LevelTitle || i == headRowNo) {
+								headRow = worksheet.getRow(i);
+							} else {
+								continue;
+							}
+							
+							var csvLoop1Groups = {}, csvLoop2Groups = {}, csvFixedGroups = {};
+							headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+								if (colNumber <= common_heads.length) return;
+
+								diff = colNumber - common_heads.length - fixed_head_count;
+								group2 = Math.ceil(diff / loop2_col_count);
+								mod2 = diff % loop2_col_count;
+
+								if (colNumber <= common_heads.length + fixed_head_count) { //处于fixed列
+									group2 = 0;
+									group = 0;
+									titleIdx = colNumber - common_heads.length;
+								} else { //处于循环的列
+									if (mod2 > 0 && mod2 <= loop2_col_skips) { //处于第一层循环（内循环）
+										group = Math.ceil(mod2 / loop1_col_count);
+										mod = mod2 % loop1_col_count;
+										if (mod == 0) {
+											titleIdx = loop1_col_count;
+										} else {
+											titleIdx = mod;
+										}
+									} else { //处于第二层循环（外循环）
+										group = 0;
+										if (mod2 == 0) {
+											titleIdx = loop2_col_count - loop2_col_skips;
+										} else {
+											titleIdx = mod2 - loop2_col_skips;
+										}
+									}
+								}
+
+								//处理title行
+								if (processFixedLevelTitle && group2 == 0 && group == 0) {
+									getCellTitleValue(cell, csvFixedGroups, fixedLevel, titleIdx, group, group2);
+								}
+								if (processLoop1LevelTitle && group2 > 0 && group > 0) {
+									getCellTitleValue(cell, csvLoop1Groups, loop1Level, titleIdx, group, group2);
+								}
+								if (processLoop2LevelTitle && group2 > 0 && group == 0) {
+									getCellTitleValue(cell, csvLoop2Groups, loop2Level, titleIdx, group, group2);
+								}
+
+								var loop_head_with_group = null, loop_head = null;
+								//处理head行的fixed段
+								if (i == headRowNo && group2 == 0 && group == 0) {
+									loop_head = fixed_heads[titleIdx - 1];
+									loop_head_with_group = loop_head + " " + String(group2) + " " + String(group); //headName+空格+group号
+									cols_with_group.push(loop_head_with_group);
+								} // end of one loop head process
+
+								//处理head行的loop段
+								if (i == headRowNo && group2 > 0) {
+									if (group == 0) { //外层循环的时候
+										loop_head = loop2_heads[titleIdx - 1];
+									} else { //内层循环的时候
+										loop_head = loop1_heads[titleIdx - 1];
+									}
+									loop_head_with_group = loop_head + " " + String(group2) + " " + String(group); //headName+空格+group号
+									cols_with_group.push(loop_head_with_group);
+								} // end of one loop head process
+
+							}); // end of headRow.eachCell
+
+							//保存处理的title行
+							if (processFixedLevelTitle) { 
+								appendLevel(fixed_cols, csvFixedLevels, fixedLevel, csvFixedGroups, isToDbColumnName);
+							}
+							if (processLoop1LevelTitle) { 
+								appendLevel(cols, csvLevels, loop1Level, csvLoop1Groups, isToDbColumnName);
+							}
+							if (processLoop2LevelTitle) { 
+								appendLevel(loop2_cols, csvLoop2Levels, loop2Level, csvLoop2Groups, isToDbColumnName);
+							}
+
+							if (i == headRowNo) { //保存loop的最大group数和loop_heads的列名
+								max_col_group = group2;
+								if (group == 0) { //外层循环的时候
+									last_group_cols = loop2_col_skips + titleIdx;
+								} else { //内层循环的时候
+									last_group_cols = (group - 1) * loop1_col_count + titleIdx;
+								}
+								//保存loop_heads的所有列名
+								appendHeads(fixed_cols, fixed_heads, isToDbColumnName);
+								appendHeads(cols, loop1_heads, isToDbColumnName);
+								appendHeads(loop2_cols, loop2_heads, isToDbColumnName);
+							}
+
+						} // end of headRowNo loop
+
+						//设置表头
+						for (i = 0; i < cols_with_group.length; i++) {
+							worksheet.getColumn(i+1).key = cols_with_group[i];
+						}
+
+						var loop_group_col_count = 0, inner_loop_col_count = 0;
+						//获取数据
+						worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+							if (rowNumber >= firstDataLine) {
+								
+								//获取一行中的fixed
+								if (hasFixedHead) {
+									appendDataLine(csvFixedDatas, row, rowNumber, common_heads, common_head_types, fixed_head_count, 
+										fixed_heads, fixed_head_types, csvFixedLevels, fixed_cols, fixed_head_count, 0, 0);
+								}
+								
+								//循环列的数据
+								for (var group2 = 1; group2 <= max_col_group; group2++) {
+									//内循环件数
+									var innerGroup = 0;
+									//内循环索引
+									var group = 0;
+
+									//调整group的字段数
+									if (group2 == max_col_group) {
+										loop_group_col_count = last_group_cols;
+										if (last_group_cols >= loop2_col_skips) {
+											innerGroup = loop2_col_skips / loop1_col_count;
+										} else {
+											innerGroup = Math.ceil(last_group_cols / loop1_col_count);
+										}
+									} else {
+										loop_group_col_count = loop2_col_count;
+										innerGroup = loop2_col_skips / loop1_col_count;
+									}
+
+									//获取一行中的内循环
+									for (group = 1; group <= innerGroup; group++) {
+										if (loop_group_col_count >= group * loop1_col_count) {
+											inner_loop_col_count = loop1_col_count;
+										} else {
+											inner_loop_col_count = loop_group_col_count - (group - 1) * loop1_col_count;
+										}
+
+										appendDataLine(csvDatas, row, rowNumber, common_heads, common_head_types, loop1_col_count, 
+											loop1_heads, loop1_head_types, csvLevels, cols, inner_loop_col_count, group, group2);
+										
+									} // end of innerGroup loop
+
+									//存在外循环的场合, 获取一行中的外循环
+									if (loop_group_col_count > loop2_col_skips) { 
+										appendDataLine(csvLoop2Datas, row, rowNumber, common_heads, common_head_types, loop2_col_count - loop2_col_skips, 
+											loop2_heads, loop2_head_types, csvLoop2Levels, loop2_cols, loop_group_col_count - loop2_col_skips, 0, group2);
+									}
+
+								} // end of one line
+								
+							} // end of all data line
+						});
+						workbook = null;
+
+						ret["heads"] = cols;
+						ret["details"] = csvDatas;
+						ret["fixed_heads"] = fixed_cols;
+						ret["fixed_details"] = csvFixedDatas;
+						ret["loop2_heads"] = loop2_cols;
+						ret["loop2_details"] = csvLoop2Datas;
 						resolve(ret);
 					} catch (e) {
 						workbook = null;
@@ -624,14 +1049,14 @@ x_58872_needit.ExcelUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 09:01:34</sys_created_on>
         <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
-        <sys_mod_count>75</sys_mod_count>
+        <sys_mod_count>76</sys_mod_count>
         <sys_name>x_58872_needit.ExcelUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-22 06:29:23</sys_updated_on>
+        <sys_updated_on>2024-07-23 08:44:30</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>

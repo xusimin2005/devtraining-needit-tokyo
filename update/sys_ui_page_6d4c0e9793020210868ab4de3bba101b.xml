@@ -992,34 +992,59 @@ $j('#transform3Input').change(function() {
 	}
 	var fileObj = $j('#transform3Input').prop('files')[0];
 	// 处理所选择的文件
-	var params = {
-		"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
-		"common_head_types": ["string", "string", "string", "string", "string"],
-		"loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
-		"level": 2, "loop_levels": [
-			{"row": 1, "loop_col_starts": [1], "loop_col_spans": [7], 
-			"level_titles": ["星期"], "level_title_types": ["string"]},
-			{"row": 2, "loop_col_starts": [1], "loop_col_spans": [1], 
-			"level_titles": ["日期"], "level_title_types": ["date"]}
-		]
-	};
+	// var params = {
+	// 	"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
+	// 	"common_head_types": ["string", "string", "string", "string", "string"],
+	// 	"loop_col_count": 1, "loop_heads": ["数量"], "loop_head_types": ["number"], 
+	// 	"level": 2, "loop_levels": [
+	// 		{"row": 1, "loop_col_starts": [1], "col_spans": [7], 
+	// 		"level_titles": ["星期"], "level_title_types": ["string"]},
+	// 		{"row": 2, "loop_col_starts": [1], "loop_col_spans": [1], 
+	// 		"level_titles": ["日期"], "level_title_types": ["date"]}
+	// 	]
+	// };
 	// var params = {
 	// 	"common_heads": ["機種", "販社", "仕向地", "仕向港", "PSI"], 
 	// 	"common_head_types": ["string", "string", "string", "string", "string"],
 	// 	"loop_col_count": 7, "loop_heads": ["数量1","数量2","数量3","数量4","数量5","数量6","数量7"],
 	// 	"loop_head_types": ["number", "number", "number", "number", "number", "number", "number"], 
 	// 	"level": 2, "loop_levels": [
-	// 		{"row": 1, "loop_col_starts": [1], "loop_col_spans": [7], 
+	// 		{"row": 1, "loop_col_starts": [1], "col_spans": [7], 
 	// 		"level_titles": ["星期"], "level_title_types": ["string"]}
 	// 	]
 	// };
-	excelUtility.parseLongToShort(fileObj, params)
-		.then(function(datas) {
-			csvUtility.saveCsv(datas.details, "文件导出测试3.csv");
-		}).catch(function(message) {
-			alert(message);
-		});
-
+	var params = {
+		"level": 9, 
+		"common_heads": ["No", "FGLmodelname", "Salesmodelname", "Factroy", "E", "Category", "I/O", "H", "COGS", "J", "Index", "Con Pro", "Arg Chk", "Rep Model", "SMS"], 
+		"common_head_types": ["number", "string", "string", "string", "string", "string", "string", "string", "number", "string", "number", "string", "string", "string", "string"],
+		"fixed_head_count": 2, 
+		"fixed_heads": ["Last On Hand", "Last OTW OH"], 
+		"fixed_head_types": ["number", "number"],
+		"fixed_head_levels": [
+			{"row": 1, "loop_col_starts": [1], "col_spans": [2], 
+			"level_titles": ["Last Date"], "level_title_types": ["date"]}
+		], 
+		"loop1_col_count": 15, 
+		"loop1_heads": ["Shipped", "Production", "P Revised FG XX", "P Revised HQ", "P TTL", "Internal Transaction", "Comment", "Forecast", "Ordered", "S Revised", "S TTL", "On Hand", "OTW", "OTW OH", "INDEX I TTL"], 
+		"loop1_head_types": ["number", "number", "number", "number", "number", "number", "number", "number", "number", "number", "number", "number", "number", "number", "result"], 
+		"loop2_col_count": 48, "loop2_col_skips": 45, 
+		"loop2_heads": ["P", "S", "I"], 
+		"loop2_head_types": ["result", "result", "result"], 
+		"loop1_levels": [
+			{"row": 1, "loop_col_starts": [1], "col_spans": [15], 
+			"level_titles": ["Date"], "level_title_types": ["date"]}
+		], 
+		"loop2_levels": [
+			{"row": 1, "loop_col_starts": [1], "col_spans": [3], 
+			"level_titles": ["Date"], "level_title_types": ["string"]}
+		]
+	};
+	excelUtility.parseLongToShort2(fileObj, params, false, "PSI", true)
+	.then(function(datas) {
+		csvUtility.saveCsv(datas.details, "文件导出测试6.csv");
+	}).catch(function(message) {
+		alert(message);
+	});
 	//清空原选择框是为了更好的触发onChang事件
 	$j('#transform3Input').val("");
 });
@@ -1215,13 +1240,13 @@ $j('#change_data').click(function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-14 03:12:55</sys_created_on>
         <sys_id>6d4c0e9793020210868ab4de3bba101b</sys_id>
-        <sys_mod_count>1151</sys_mod_count>
+        <sys_mod_count>1152</sys_mod_count>
         <sys_name>sample_page</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_6d4c0e9793020210868ab4de3bba101b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-22 06:13:45</sys_updated_on>
+        <sys_updated_on>2024-07-23 08:52:47</sys_updated_on>
     </sys_ui_page>
 </record_update>
