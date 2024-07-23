@@ -776,16 +776,20 @@ x_58872_needit.ExcelUtility = (function() {
 		//isToDbColumnName: 是否把title行的列名转换成db名
 		//sheetNo: sheet的序号，从1开始
 		//hasFixedHead: 是否包含固定标题列
+		//limit_loop_cnt: 是否包含有限循环项目，有的话设定循环次数
 		//return: Promise，成功值（解析内容的object对象），失败值（失败原因）
-		parseLongToShort2: function(fileObj, params, isToDbColumnName, sheetNo, hasFixedHead) {
-			if (typeof isToDbColumnName == "undefined") {
+		parseLongToShort2: function(fileObj, params, isToDbColumnName, sheetNo, hasFixedHead, limit_loop_cnt) {
+			if (typeof isToDbColumnName == "undefined" || isToDbColumnName == null) {
 				isToDbColumnName = false;
 			}
-			if (typeof sheetNo == "undefined") {
+			if (typeof sheetNo == "undefined" || sheetNo == null) {
 				sheetNo = 1;
 			}
-			if (typeof hasFixedHead == "undefined") {
+			if (typeof hasFixedHead == "undefined" || hasFixedHead == null) {
 				hasFixedHead = false;
+			}
+			if (typeof limit_loop_cnt == "undefined" || limit_loop_cnt == null) {
+				limit_loop_cnt = 0;
 			}
 			return this.getLocalExcel(fileObj).then(function(workbook) {
 				return new Promise(function(resolve, reject) {
@@ -795,10 +799,10 @@ x_58872_needit.ExcelUtility = (function() {
 						sheetNo = worksheet.id;
 					}
 
-					var cols = [], loop2_cols = [], fixed_cols = [];
+					var cols = [], loop2_cols = [], fixed_cols = [], limit_cols = [];
 					var cols_with_group = [];
-					var csvDatas = [], csvLoop2Datas = [], csvFixedDatas = [];
-					var csvLevels = [], csvLoop2Levels = [], csvFixedLevels = [];
+					var csvDatas = [], csvLoop2Datas = [], csvFixedDatas = [], csvLimitDatas = [];
+					var csvLevels = [], csvLoop2Levels = [], csvFixedLevels = [], csvLimitLevels = [];
 					var ret = {};
 					var i = 0;
 					var max_col_group = 0, last_group_cols = 0;
@@ -830,17 +834,28 @@ x_58872_needit.ExcelUtility = (function() {
 							fixed_head_types = params.fixed_head_types;
 							fixed_head_levels = params.fixed_head_levels;
 						}
+
+						//动态设置limit_loop
+						var limit_loop_col_count = 0, total_limit_loop_col_count = 0, limit_loop_heads = null, limit_loop_head_types = null, limit_loop_levels = null;
+						if (limit_loop_cnt > 0) {
+							limit_loop_col_count = params.limit_loop_col_count;
+							total_limit_loop_col_count = limit_loop_col_count * limit_loop_cnt;
+							limit_loop_heads = params.limit_loop_heads;
+							limit_loop_head_types = params.limit_loop_head_types;
+							limit_loop_levels = params.limit_loop_levels;
+						}
 						
 						//获取表头
 						var headRow = null;
-						var loop1Level = null, loop2Level = null, fixedLevel = null;
-						var processLoop1LevelTitle = false, processLoop2LevelTitle = false, processFixedLevelTitle = false;
+						var loop1Level = null, loop2Level = null, fixedLevel = null, limitLevel = null;
+						var processLoop1LevelTitle = false, processLoop2LevelTitle = false, processFixedLevelTitle = false, processlimitLevelTitle = false;
 
 						//先保留共通部分，分别设到cols_with_group（excel的列别名）和cols（json数据的字段名）
 						cols_with_group.push.apply(cols_with_group, common_heads);
 						appendHeads(cols, common_heads, isToDbColumnName);
 						appendHeads(loop2_cols, common_heads, isToDbColumnName);
-						appendHeads(fixed_cols, common_heads, isToDbColumnName);
+						if (hasFixedHead) appendHeads(fixed_cols, common_heads, isToDbColumnName);
+						if (limit_loop_cnt > 0) appendHeads(limit_cols, common_heads, isToDbColumnName);
 
 						for (i = 1; i <= headRowNo; i++) {
 							//检查是否是需要保留值的title行
@@ -849,6 +864,13 @@ x_58872_needit.ExcelUtility = (function() {
 								processFixedLevelTitle = false;
 							} else {
 								processFixedLevelTitle = true;
+							}
+
+							limitLevel = findLevel(i, limit_loop_levels);
+							if (limitLevel == null) {
+								processlimitLevelTitle = false;
+							} else {
+								processlimitLevelTitle = true;
 							}
 
 							loop1Level = findLevel(i, loop1_levels);
@@ -866,25 +888,25 @@ x_58872_needit.ExcelUtility = (function() {
 							}
 
 							//如果是需要保存值的标题行或者是标题行的最后一行
-							if (processFixedLevelTitle || processLoop1LevelTitle || processLoop2LevelTitle || i == headRowNo) {
+							if (processFixedLevelTitle || processlimitLevelTitle || processLoop1LevelTitle || processLoop2LevelTitle || i == headRowNo) {
 								headRow = worksheet.getRow(i);
 							} else {
 								continue;
 							}
 							
-							var csvLoop1Groups = {}, csvLoop2Groups = {}, csvFixedGroups = {};
+							var csvLoop1Groups = {}, csvLoop2Groups = {}, csvFixedGroups = {}, csvLimitGroups = {};
 							headRow.eachCell({ includeEmpty: true }, function(cell, colNumber) {
 								if (colNumber <= common_heads.length) return;
-
-								diff = colNumber - common_heads.length - fixed_head_count;
-								group2 = Math.ceil(diff / loop2_col_count);
-								mod2 = diff % loop2_col_count;
 
 								if (colNumber <= common_heads.length + fixed_head_count) { //处于fixed列
 									group2 = 0;
 									group = 0;
 									titleIdx = colNumber - common_heads.length;
 								} else { //处于循环的列
+									diff = colNumber - common_heads.length - fixed_head_count;
+									group2 = Math.ceil(diff / loop2_col_count);
+									mod2 = diff % loop2_col_count;
+									
 									if (mod2 > 0 && mod2 <= loop2_col_skips) { //处于第一层循环（内循环）
 										group = Math.ceil(mod2 / loop1_col_count);
 										mod = mod2 % loop1_col_count;
@@ -1049,14 +1071,14 @@ x_58872_needit.ExcelUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 09:01:34</sys_created_on>
         <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
-        <sys_mod_count>76</sys_mod_count>
+        <sys_mod_count>77</sys_mod_count>
         <sys_name>x_58872_needit.ExcelUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-23 08:44:30</sys_updated_on>
+        <sys_updated_on>2024-07-23 10:33:33</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>
