@@ -58,14 +58,7 @@ x_58872_needit.ExcelUtility = (function() {
 					var D = obj.getDate();
 					var DD = D < 10 ? ('0' + D) : String(D);
 
-					var strDate = null;
-					if (format == 'yyyyMMdd') {
-						strDate = YYYY + MM + DD;
-					} else if (format == 'yyyyMM') {
-						strDate = YYYY + MM;
-					} else {
-						strDate = YYYY + '-' + MM + '-' + DD;
-					}
+					var strDate = YYYY + '-' + MM + '-' + DD;
 
 					//包含时间的场合yyyy-MM-dd HH:mm:ss
 					if (format == 'yyyy-MM-dd HH:mm:ss') {
@@ -1186,14 +1179,14 @@ x_58872_needit.ExcelUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 09:01:34</sys_created_on>
         <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
-        <sys_mod_count>86</sys_mod_count>
+        <sys_mod_count>88</sys_mod_count>
         <sys_name>x_58872_needit.ExcelUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-25 04:05:44</sys_updated_on>
+        <sys_updated_on>2024-07-25 05:38:24</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>
