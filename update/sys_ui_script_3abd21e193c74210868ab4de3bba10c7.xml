@@ -21,22 +21,60 @@ x_58872_needit.Utility = (function() {
 		"1: NOT_FOUND_ERR", "2: SECURITY_ERR", "3: ABORT_ERR", 
 		"4: NOT_READABLE_ERR", "5: ENCODING_ERR"];
 
-	function dateToString(obj) {
+	//format的标准格式为yyyy-MM-dd HH:mm:ss，默认值为yyyy-MM-dd
+	function dateToString(obj, format) {
 		if (obj) {
 			if (typeof obj == "string") {
 				return obj;
 			} else {
+				if (!format) {
+					format = 'yyyy-MM-dd';
+				}
 				try {
-					var Y = obj.getFullYear();
+					var YYYY = String(obj.getFullYear());
 					var M = obj.getMonth() + 1;
+					var MM = M < 10 ? ('0' + M) : String(M);
 					var D = obj.getDate();
-					return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
+					var DD = D < 10 ? ('0' + D) : String(D);
+
+					var strDate = null;
+					if (format == 'yyyyMMdd') {
+						strDate = YYYY + MM + DD;
+					} else if (format == 'yyyyMM') {
+						strDate = YYYY + MM;
+					} else {
+						strDate = YYYY + '-' + MM + '-' + DD;
+					}
+
+					//包含时间的场合yyyy-MM-dd HH:mm:ss
+					if (format == 'yyyy-MM-dd HH:mm:ss') {
+						var h = obj.getHours();
+						var hh = h < 10 ? ('0' + h) : String(h);
+						var m = obj.getMinutes();
+						var mm = m < 10 ? ('0' + m) : String(m);
+						var s = obj.getSeconds();
+						var ss = s < 10 ? ('0' + s) : String(s);
+
+						var strTime = hh + ':' + mm + ':' + ss;
+
+						return strDate + ' ' + strTime;
+					} else {
+						return strDate;
+					}
 				} catch(ex) {
 					return obj.toString();
 				}
 			}
 		} else {
 			return '';
+		}
+	}
+
+	function stringToDate(obj) {
+		if (obj) {
+			return new Date(obj);
+		} else {
+			return new Date();
 		}
 	}
 
@@ -56,6 +94,36 @@ x_58872_needit.Utility = (function() {
 			return private_function();
 		},
 */
+		addYear: function(obj, cnt, format) {
+			var d = stringToDate(obj);
+			d.setYear(d.getYear() + cnt);
+			if (format) {
+				return dateToString(d, format);
+			} else {
+				return d;
+			}
+		},
+
+		addMonth: function(obj, cnt, format) {
+			var d = stringToDate(obj);
+			d.setMonth(d.getMonth() + cnt);
+			if (format) {
+				return dateToString(d, format);
+			} else {
+				return d;
+			}
+		},
+
+		addDate: function(obj, cnt, format) {
+			var d = stringToDate(obj);
+			d.setDate(d.getDate() + cnt);
+			if (format) {
+				return dateToString(d, format);
+			} else {
+				return d;
+			}
+		},
+
 		transformString: function(obj) {
 			var objType = typeof obj;
 			if (obj === null || obj === "" || objType === "undefined") {
@@ -189,14 +257,14 @@ x_58872_needit.Utility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-06-27 07:43:27</sys_created_on>
         <sys_id>3abd21e193c74210868ab4de3bba10c7</sys_id>
-        <sys_mod_count>5</sys_mod_count>
+        <sys_mod_count>8</sys_mod_count>
         <sys_name>x_58872_needit.Utility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_3abd21e193c74210868ab4de3bba10c7</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-11 08:14:37</sys_updated_on>
+        <sys_updated_on>2024-07-25 02:39:56</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>

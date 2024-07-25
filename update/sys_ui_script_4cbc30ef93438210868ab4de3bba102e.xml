@@ -42,16 +42,46 @@ x_58872_needit.ExcelUtility = (function() {
 		return v.replaceAll("_", " ");
 	}
 
-	function dateToString(obj) {
+	//format的标准格式为yyyy-MM-dd HH:mm:ss，默认值为yyyy-MM-dd
+	function dateToString(obj, format) {
 		if (obj) {
 			if (typeof obj == "string") {
 				return obj;
 			} else {
+				if (!format) {
+					format = 'yyyy-MM-dd';
+				}
 				try {
-					var Y = obj.getFullYear();
+					var YYYY = String(obj.getFullYear());
 					var M = obj.getMonth() + 1;
+					var MM = M < 10 ? ('0' + M) : String(M);
 					var D = obj.getDate();
-					return Y + '-' + (M < 10 ? ('0' + M) : M) + '-' + (D < 10 ? ('0' + D) : D);
+					var DD = D < 10 ? ('0' + D) : String(D);
+
+					var strDate = null;
+					if (format == 'yyyyMMdd') {
+						strDate = YYYY + MM + DD;
+					} else if (format == 'yyyyMM') {
+						strDate = YYYY + MM;
+					} else {
+						strDate = YYYY + '-' + MM + '-' + DD;
+					}
+
+					//包含时间的场合yyyy-MM-dd HH:mm:ss
+					if (format == 'yyyy-MM-dd HH:mm:ss') {
+						var h = obj.getHours();
+						var hh = h < 10 ? ('0' + h) : String(h);
+						var m = obj.getMinutes();
+						var mm = m < 10 ? ('0' + m) : String(m);
+						var s = obj.getSeconds();
+						var ss = s < 10 ? ('0' + s) : String(s);
+
+						var strTime = hh + ':' + mm + ':' + ss;
+
+						return strDate + ' ' + strTime;
+					} else {
+						return strDate;
+					}
 				} catch(ex) {
 					return obj.toString();
 				}
@@ -61,7 +91,7 @@ x_58872_needit.ExcelUtility = (function() {
 		}
 	}
 
-	function transformString(obj) {
+	function transformString(obj, format) {
 		var objType = typeof obj;
 		if (obj === null || obj === "" || objType === "undefined") {
 			return "";
@@ -78,7 +108,7 @@ x_58872_needit.ExcelUtility = (function() {
 			} else if ("result" in obj) {
 				return obj.result;
 			} else if ("getDate" in obj) {
-				return dateToString(obj);
+				return dateToString(obj, format);
 			} else {
 				return obj.toString();
 			}
@@ -98,7 +128,9 @@ x_58872_needit.ExcelUtility = (function() {
 				return v;
 			}
 		} else if (type === "date") {
-			return dateToString(cell.value);
+			return dateToString(cell.value, "yyyy-MM-dd");
+		} else if (type === "datetime") {
+			return dateToString(cell.value, "yyyy-MM-dd HH:mm:ss");
 		} else if (type === "result") {
 			var r = cell.result;
 			if (typeof r == "object") {
@@ -1154,14 +1186,14 @@ x_58872_needit.ExcelUtility = (function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-03 09:01:34</sys_created_on>
         <sys_id>4cbc30ef93438210868ab4de3bba102e</sys_id>
-        <sys_mod_count>85</sys_mod_count>
+        <sys_mod_count>86</sys_mod_count>
         <sys_name>x_58872_needit.ExcelUtility</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_script_4cbc30ef93438210868ab4de3bba102e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-24 08:53:50</sys_updated_on>
+        <sys_updated_on>2024-07-25 04:05:44</sys_updated_on>
         <ui_type>10</ui_type>
         <use_scoped_format>true</use_scoped_format>
     </sys_ui_script>
