@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="cba053728367461043b695d6feaad375" extends="sys_import_set_row" label="D1 Ver Temp" max_length="40" name="x_58872_needit_d1_ver_temp" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Version" label="Version" max_length="40" name="u_version" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Company" label="Company" max_length="40" name="u_company" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Date" label="Date" max_length="40" name="u_date" type="glide_date"/>
+        <element attributes="import_attribute_name=P" label="P" max_length="40" name="u_p" type="integer"/>
+        <element attributes="import_attribute_name=I" label="I" max_length="40" name="u_i" type="integer"/>
+        <element attributes="import_attribute_name=S" label="S" max_length="40" name="u_s" type="integer"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Item" label="Item" max_length="40" name="u_item" type="string"/>
+    </element>
+</database>

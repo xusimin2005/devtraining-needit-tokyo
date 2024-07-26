@@ -1,28 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update>
-    <sys_dictionary action="INSERT_OR_UPDATE" element="u_date" table="x_58872_needit_d1">
+    <sys_dictionary action="INSERT_OR_UPDATE" element="u_s" table="x_58872_needit_d1_ver_temp">
         <active>true</active>
         <array>false</array>
-        <attributes/>
+        <attributes>import_attribute_name=S</attributes>
         <audit>false</audit>
-        <calculation><![CDATA[(function calculatedFieldValue(current) {
-
-	// Add your code here
-    var u_ver = current.u_version;
-    if (u_ver) {
-        var date = u_ver + '-01';
-        var simpleDateFormat = 'yyyy-MM-dd';
-        var gdt = new GlideDateTime();
-        gdt.setDisplayValue(date, simpleDateFormat);
-        return gdt.getLocalDate();
-    } else {
-        return null; // return the calculated value
-    }
-
-})(current);]]></calculation>
-        <choice/>
+        <calculation/>
+        <choice>0</choice>
         <choice_field/>
         <choice_table/>
-        <column_label>Date</column_label>
+        <column_label>S</column_label>
         <comments/>
         <create_roles/>
         <default_value/>
@@ -35,16 +21,16 @@
         <dynamic_creation_script/>
         <dynamic_default_value/>
         <dynamic_ref_qual/>
-        <element>u_date</element>
+        <element>u_s</element>
         <element_reference>false</element_reference>
         <foreign_database/>
         <formula/>
         <function_definition/>
         <function_field>false</function_field>
-        <internal_type display_value="">glide_date</internal_type>
+        <internal_type display_value="Integer">integer</internal_type>
         <mandatory>false</mandatory>
         <max_length>40</max_length>
-        <name>x_58872_needit_d1</name>
+        <name>x_58872_needit_d1_ver_temp</name>
         <next_element/>
         <primary>false</primary>
         <read_only>false</read_only>
@@ -60,14 +46,14 @@
         <staged>false</staged>
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2024-07-25 09:43:47</sys_created_on>
-        <sys_name>Date</sys_name>
+        <sys_created_on>2024-07-26 08:22:26</sys_created_on>
+        <sys_name>S</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
-        <sys_update_name>sys_dictionary_x_58872_needit_d1_u_date</sys_update_name>
+        <sys_update_name>sys_dictionary_x_58872_needit_d1_ver_temp_u_s</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-26 03:48:58</sys_updated_on>
+        <sys_updated_on>2024-07-26 08:22:26</sys_updated_on>
         <table_reference>false</table_reference>
         <text_index>false</text_index>
         <unique>false</unique>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>true</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>x_58872_needit_d1_ver</collection>
+        <condition/>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>UpdateD1ToNewest</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous /*null when async*/) {
+	var targetTable = "x_58872_needit_d1";
+	if (current.operation() == 'insert' || current.operation() == 'update') {
+		var gr1 = new GlideRecord(targetTable);
+		gr1.addQuery('u_date', current.getValue('u_date'));
+		gr1.addQuery('u_company', current.getValue('u_company'));
+		gr1.addQuery('u_item', current.getValue('u_item'));
+		gr1.query();
+		if (gr1.next()) { //存在相同供应商，机种
+			if (gr1.u_version.nil() || current.u_version >= gr1.u_version) {
+				gr1.setValue('u_p', current.getValue('u_p'));
+				gr1.setValue('u_s', current.getValue('u_s'));
+				gr1.setValue('u_i', current.getValue('u_i'));
+				gr1.setValue('u_version', current.getValue('u_version'));
+				gr1.update();
+			}
+		} else { //新规供应商，机种
+			var grInsert = new GlideRecord(targetTable);
+			grInsert.initialize();
+			grInsert.setValue('u_date', current.getValue('u_date'));
+			grInsert.setValue('u_company', current.getValue('u_company'));
+			grInsert.setValue('u_item', current.getValue('u_item'));
+			grInsert.setValue('u_p', current.getValue('u_p'));
+			grInsert.setValue('u_s', current.getValue('u_s'));
+			grInsert.setValue('u_i', current.getValue('u_i'));
+			grInsert.setValue('u_version', current.getValue('u_version'));
+			grInsert.insert();
+		}
+	} else if (current.operation() == 'delete') {
+		//
+	}
+
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-26 09:21:37</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>51ec17ba8367461043b695d6feaad37d</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>UpdateD1ToNewest</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_script_51ec17ba8367461043b695d6feaad37d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-26 10:03:00</sys_updated_on>
+        <template/>
+        <when>after</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=51ec17ba8367461043b695d6feaad37d"/>
+</record_update>

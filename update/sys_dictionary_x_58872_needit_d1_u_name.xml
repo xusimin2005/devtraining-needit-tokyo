@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update>
-    <sys_dictionary action="INSERT_OR_UPDATE" element="u_date" table="x_58872_needit_d1">
+    <sys_dictionary action="INSERT_OR_UPDATE" element="u_name" table="x_58872_needit_d1">
         <active>true</active>
         <array>false</array>
         <attributes/>
@@ -7,22 +7,76 @@
         <calculation><![CDATA[(function calculatedFieldValue(current) {
 
 	// Add your code here
-    var u_ver = current.u_version;
-    if (u_ver) {
-        var date = u_ver + '-01';
-        var simpleDateFormat = 'yyyy-MM-dd';
-        var gdt = new GlideDateTime();
-        gdt.setDisplayValue(date, simpleDateFormat);
-        return gdt.getLocalDate();
+    var u_date = current.u_date;
+    if (u_date) {
+		var d = u_date.getDisplayValue();
+        var year = d.substring(2, 4);
+        var month = parseInt(d.substring(5, 7));
+		var months = [
+			"", 
+			"Jan", // 01
+			"Feb", // 02
+			"Mar", // 03
+			"Apr", // 04
+			"May", // 05
+			"Jun", // 06
+			"Jul", // 07
+			"Aug", // 08
+			"Sep", // 09
+			"Oct", // 10
+			"Nov", // 11
+			"Dec"  // 12
+		];
+		var m = months[month];
+		// var m = "";
+		// switch (month) {
+		// 	case 1:
+		// 		m = "Jan";
+		// 		break;
+		// 	case 2:
+		// 		m = "Feb";
+		// 		break;
+		// 	case 3:
+		// 		m = "Mar";
+		// 		break;
+		// 	case 4:
+		// 		m = "Apr";
+		// 		break;
+		// 	case 5:
+		// 		m = "May";
+		// 		break;
+		// 	case 6:
+		// 		m = "Jun";
+		// 		break;
+		// 	case 7:
+		// 		m = "Jul";
+		// 		break;
+		// 	case 8:
+		// 		m = "Aug";
+		// 		break;
+		// 	case 9:
+		// 		m = "Sep";
+		// 		break;
+		// 	case 10:
+		// 		m = "Oct";
+		// 		break;
+		// 	case 11:
+		// 		m = "Nov";
+		// 		break;
+		// 	case 12:
+		// 		m = "Dec";
+		// 		break;
+		// }
+		return m + "-" + year;
     } else {
         return null; // return the calculated value
     }
-
+	
 })(current);]]></calculation>
         <choice/>
         <choice_field/>
         <choice_table/>
-        <column_label>Date</column_label>
+        <column_label>Name</column_label>
         <comments/>
         <create_roles/>
         <default_value/>
@@ -30,24 +84,24 @@
         <delete_roles/>
         <dependent/>
         <dependent_on_field/>
-        <display>false</display>
+        <display>true</display>
         <dynamic_creation>false</dynamic_creation>
         <dynamic_creation_script/>
         <dynamic_default_value/>
         <dynamic_ref_qual/>
-        <element>u_date</element>
+        <element>u_name</element>
         <element_reference>false</element_reference>
         <foreign_database/>
         <formula/>
         <function_definition/>
         <function_field>false</function_field>
-        <internal_type display_value="">glide_date</internal_type>
+        <internal_type display_value="String">string</internal_type>
         <mandatory>false</mandatory>
-        <max_length>40</max_length>
+        <max_length>8</max_length>
         <name>x_58872_needit_d1</name>
         <next_element/>
         <primary>false</primary>
-        <read_only>false</read_only>
+        <read_only>true</read_only>
         <read_roles/>
         <reference/>
         <reference_cascade_rule/>
@@ -60,21 +114,21 @@
         <staged>false</staged>
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2024-07-25 09:43:47</sys_created_on>
-        <sys_name>Date</sys_name>
+        <sys_created_on>2024-07-26 05:22:14</sys_created_on>
+        <sys_name>Name</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
-        <sys_update_name>sys_dictionary_x_58872_needit_d1_u_date</sys_update_name>
+        <sys_update_name>sys_dictionary_x_58872_needit_d1_u_name</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-26 03:48:58</sys_updated_on>
+        <sys_updated_on>2024-07-26 06:39:59</sys_updated_on>
         <table_reference>false</table_reference>
         <text_index>false</text_index>
         <unique>false</unique>
         <use_dependent_field>false</use_dependent_field>
         <use_dynamic_default>false</use_dynamic_default>
         <use_reference_qualifier>simple</use_reference_qualifier>
-        <virtual>false</virtual>
+        <virtual>true</virtual>
         <virtual_type>script</virtual_type>
         <widget/>
         <write_roles/>
