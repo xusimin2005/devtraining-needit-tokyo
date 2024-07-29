@@ -29,34 +29,68 @@
         <role_conditions/>
         <script><![CDATA[(function executeRule(current, previous /*null when async*/) {
 	var targetTable = "x_58872_needit_d1";
+	var sourceTable = "x_58872_needit_d1_ver";
+
+	var grSource = null, grTarget = null, grInsert = null;
+	var current_u_date = current.getValue('u_date');
+	var current_u_company = current.getValue('u_company');
+	var current_u_item = current.getValue('u_item');
+	var current_u_version = current.getValue('u_version');
+
 	if (current.operation() == 'insert' || current.operation() == 'update') {
-		var gr1 = new GlideRecord(targetTable);
-		gr1.addQuery('u_date', current.getValue('u_date'));
-		gr1.addQuery('u_company', current.getValue('u_company'));
-		gr1.addQuery('u_item', current.getValue('u_item'));
-		gr1.query();
-		if (gr1.next()) { //存在相同供应商，机种
-			if (gr1.u_version.nil() || current.u_version >= gr1.u_version) {
-				gr1.setValue('u_p', current.getValue('u_p'));
-				gr1.setValue('u_s', current.getValue('u_s'));
-				gr1.setValue('u_i', current.getValue('u_i'));
-				gr1.setValue('u_version', current.getValue('u_version'));
-				gr1.update();
-			}
-		} else { //新规供应商，机种
-			var grInsert = new GlideRecord(targetTable);
-			grInsert.initialize();
-			grInsert.setValue('u_date', current.getValue('u_date'));
-			grInsert.setValue('u_company', current.getValue('u_company'));
-			grInsert.setValue('u_item', current.getValue('u_item'));
-			grInsert.setValue('u_p', current.getValue('u_p'));
-			grInsert.setValue('u_s', current.getValue('u_s'));
-			grInsert.setValue('u_i', current.getValue('u_i'));
-			grInsert.setValue('u_version', current.getValue('u_version'));
-			grInsert.insert();
+		if (current.u_ative) {
+			grSource = current;
+		} else {
+			//非Active状态下退避
+			return;
 		}
 	} else if (current.operation() == 'delete') {
-		//
+		//获取更早版本的情报
+		grSource = new GlideRecord(sourceTable);
+		grSource.addQuery('u_date', current_u_date);
+		grSource.addQuery('u_company', current_u_company);
+		grSource.addQuery('u_item', current_u_item);
+		grSource.addQuery('u_version', '<', current_u_version);
+		grSource.orderByDesc('u_version');
+		grSource.setLimit(1);
+		grSource.query();
+		if (!grSource.next()) grSource = null;
+	}
+	//更新目标表
+	if (grSource != null) {
+		grTarget = new GlideRecord(targetTable);
+		grTarget.addQuery('u_date', grSource.getValue('u_date'));
+		grTarget.addQuery('u_company', grSource.getValue('u_company'));
+		grTarget.addQuery('u_item', grSource.getValue('u_item'));
+		grTarget.query();
+		if (grTarget.next()) { //存在相同供应商，机种
+			if (grTarget.u_version.nil() || grSource.u_version >= grTarget.u_version || 
+				(current.operation() == 'delete' && current.u_version == grTarget.u_version)) { 
+				grTarget.setValue('u_p', grSource.getValue('u_p'));
+				grTarget.setValue('u_s', grSource.getValue('u_s'));
+				grTarget.setValue('u_i', grSource.getValue('u_i'));
+				grTarget.setValue('u_version', grSource.getValue('u_version'));
+				grTarget.update();
+			}
+		} else { //新规供应商，机种
+			grInsert = new GlideRecord(targetTable);
+			grInsert.initialize();
+			grInsert.setValue('u_date', grSource.getValue('u_date'));
+			grInsert.setValue('u_company', grSource.getValue('u_company'));
+			grInsert.setValue('u_item', grSource.getValue('u_item'));
+			grInsert.setValue('u_p', grSource.getValue('u_p'));
+			grInsert.setValue('u_s', grSource.getValue('u_s'));
+			grInsert.setValue('u_i', grSource.getValue('u_i'));
+			grInsert.setValue('u_version', grSource.getValue('u_version'));
+			grInsert.insert();
+		}
+	} else {
+		//删除的场合，且找不到前版本的数据时，同步删除最新数据
+		new global.GlideQuery(targetTable)
+			.where('u_date', current_u_date)
+			.where('u_company', current_u_company)
+			.where('u_item', current_u_item)
+			.deleteMultiple();
 	}
 
 })(current, previous);]]></script>
@@ -66,7 +100,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>51ec17ba8367461043b695d6feaad37d</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>7</sys_mod_count>
         <sys_name>UpdateD1ToNewest</sys_name>
         <sys_overrides/>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
@@ -74,7 +108,7 @@
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_script_51ec17ba8367461043b695d6feaad37d</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-26 10:03:00</sys_updated_on>
+        <sys_updated_on>2024-07-29 06:36:16</sys_updated_on>
         <template/>
         <when>after</when>
     </sys_script>

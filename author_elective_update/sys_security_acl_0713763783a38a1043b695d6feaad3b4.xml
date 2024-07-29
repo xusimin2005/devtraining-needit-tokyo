@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_security_acl">
+    <sys_security_acl action="DELETE">
+        <active>true</active>
+        <admin_overrides>true</admin_overrides>
+        <advanced>true</advanced>
+        <condition/>
+        <description>Default access control on x_58872_needit_extend_z1_y1</description>
+        <local_or_existing>Local</local_or_existing>
+        <name>x_58872_needit_extend_z1_y1</name>
+        <operation display_value="create">create</operation>
+        <script/>
+        <security_attribute/>
+        <sys_class_name>sys_security_acl</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-29 08:47:11</sys_created_on>
+        <sys_id>0713763783a38a1043b695d6feaad3b4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_58872_needit_extend_z1_y1</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_security_acl_0713763783a38a1043b695d6feaad3b4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-29 08:47:11</sys_updated_on>
+        <type display_value="record">record</type>
+    </sys_security_acl>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</application>
+        <file_path/>
+        <instance_id>38594d971b4a7dd039a54089bd4bcb9f</instance_id>
+        <instance_name>dev196248</instance_name>
+        <name>sys_security_acl_0713763783a38a1043b695d6feaad3b4</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_security_acl"><sys_security_acl action="INSERT_OR_UPDATE"><active>true</active><admin_overrides>true</admin_overrides><advanced>true</advanced><condition/><description>Default access control on x_58872_needit_extend_z1_y1</description><local_or_existing>Local</local_or_existing><name>x_58872_needit_extend_z1_y1</name><operation display_value="create">create</operation><script/><security_attribute/><sys_class_name>sys_security_acl</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2024-07-29 08:47:11</sys_created_on><sys_id>0713763783a38a1043b695d6feaad3b4</sys_id><sys_mod_count>0</sys_mod_count><sys_name>x_58872_needit_extend_z1_y1</sys_name><sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package><sys_policy/><sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope><sys_update_name>sys_security_acl_0713763783a38a1043b695d6feaad3b4</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2024-07-29 08:47:11</sys_updated_on><type display_value="record">record</type></sys_security_acl></record_update>]]></payload>
+        <payload_hash>-987214796</payload_hash>
+        <record_name>x_58872_needit_extend_z1_y1</record_name>
+        <reverted_from/>
+        <source>af21a82093b84210868ab4de3bba101c</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-29 08:47:12</sys_created_on>
+        <sys_id>8b13763783a38a1043b695d6feaad3b7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>190fdac177c0000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-29 08:47:12</sys_updated_on>
+        <type>Access Control</type>
+        <update_guid>4f13763781a38a10b64ac33ad1db98b6</update_guid>
+        <update_guid_history>4f13763781a38a10b64ac33ad1db98b6:-987214796</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-07-29 08:55:21</sys_created_on>
+        <sys_db_object display_value="" name="sys_security_acl">sys_security_acl</sys_db_object>
+        <sys_id>30f74cc649b2431497ee405f6242d610</sys_id>
+        <sys_metadata>0713763783a38a1043b695d6feaad3b4</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_58872_needit_extend_z1_y1</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_parent display_value="">8f13763783a38a1043b695d6feaad3cf</sys_parent>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_scope_delete display_value="">94872a8897db403e8ee69a431de2fca4</sys_scope_delete>
+        <sys_update_name>sys_security_acl_0713763783a38a1043b695d6feaad3b4</sys_update_name>
+        <sys_update_version display_value="sys_security_acl_0713763783a38a1043b695d6feaad3b4">8b13763783a38a1043b695d6feaad3b7</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-07-29 08:55:21</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="a18bee7b83638a1043b695d6feaad3e5" label="Join Z1 Y1" max_length="40" name="x_58872_needit_join_z1_y1" type="collection">
+        <element default="javascript:current.getTableName();" label="Class" max_length="80" name="sys_class_name" type="sys_class_name"/>
+    </element>
+</database>
