@@ -7,52 +7,63 @@
         <client_callable>false</client_callable>
         <description/>
         <name>CollectPsiChange</name>
-        <script><![CDATA[var _setAoRecord = function(insertOrUpdate, target, source, 
-							source_table_name) {
-	target.setValue('year', source.cal_year);
-	target.setValue('active_s', source.active);
-	//无效时清空设定的值
-	if (!source.active) {
-		source.u_m1 = '';
-		source.u_m2 = '';
-		source.u_m3 = '';
-	}
-	switch(source.cal_month) {
-	case 1:
-		//取当前数据
-		target.setValue('s4', source.u_m1);
-		target.setValue('s5', source.u_m2);
-		target.setValue('s6', source.u_m3);
-		target.setValue('s7', '');
-		target.setValue('s3', '');
-		break;
-	case 2:
-		//取履历
-		if (insertOrUpdate === 'i') {
-			var queryHis = new global.GlideQuery(source_table_name)
-				.where('u_ver', '=', source.cal_year.toString() + '04')
-				.where('company', '=', source.company)
-				.where('item', '=', source.item)
-				.select('u_m1')
-				.forEach(function(history) {
-					target.setValue('s4', history.u_m1);
-				});
-			queryHis = null;
-		}
-		//取当前数据
-		target.setValue('s5', source.u_m1);
-		target.setValue('s6', source.u_m2);
-		target.setValue('s7', source.u_m3);
-		target.setValue('s3', '');
-		break;
-	}
-};
-
-var CollectPsiChange = Class.create();
+        <script><![CDATA[var CollectPsiChange = Class.create();
 CollectPsiChange.prototype = {
     initialize: function() {
     },
 
+	/**
+	 * 保存记录
+	 * 
+	 * @param {String} insertOrUpdate 新规或更新
+	 * @param {GliderRecord} target 目的表
+	 * @param {GliderRecord} source 元表
+	 * @param {String} source_table_name 元表名称
+	 */
+	_setAoRecord: function(insertOrUpdate, target, source, 
+							source_table_name) {
+		target.setValue('year', source.cal_year);
+		target.setValue('active_s', source.active);
+		//无效时清空设定的值
+		if (!source.active) {
+			source.u_m1 = '';
+			source.u_m2 = '';
+			source.u_m3 = '';
+		}
+		switch(source.cal_month) {
+		case 1:
+			//取当前数据
+			target.setValue('s4', source.u_m1);
+			target.setValue('s5', source.u_m2);
+			target.setValue('s6', source.u_m3);
+			target.setValue('s7', '');
+			target.setValue('s3', '');
+			break;
+		case 2:
+			//取履历
+			if (insertOrUpdate === 'i') {
+				var queryHis = new global.GlideQuery(source_table_name)
+					.where('u_ver', '=', source.cal_year.toString() + '04')
+					.where('company', '=', source.company)
+					.where('item', '=', source.item)
+					.select('u_m1')
+					.forEach(function(history) {
+						target.setValue('s4', history.u_m1);
+					});
+				queryHis = null;
+			}
+			//取当前数据
+			target.setValue('s5', source.u_m1);
+			target.setValue('s6', source.u_m2);
+			target.setValue('s7', source.u_m3);
+			target.setValue('s3', '');
+			break;
+		}
+	},
+
+	/**
+	 * 
+	 */
 	collect: function(type) {
 		var my_job = 'Auto Fetch Change: ';
 		var now = new GlideDateTime();
@@ -111,8 +122,7 @@ CollectPsiChange.prototype = {
 					//gr_update_target.setValue('s4', source.u_m4);
 					//gr_update_target.setValue('s5', source.u_m5);
 					//gr_update_target.setValue('s6', source.u_m6);
-					_setAoRecord(insertOrUpdate, gr_update_target, source, 
-						source_table_name);
+					this._setAoRecord(insertOrUpdate, gr_update_target, source, source_table_name);
 					gr_update_target.update();
 				} else {
 					var gr_insert_target = new GlideRecord(target_table_name);
@@ -124,7 +134,7 @@ CollectPsiChange.prototype = {
 					//gr_insert_target.setValue('s4', source.u_m4);
 					//gr_insert_target.setValue('s5', source.u_m5);
 					//gr_insert_target.setValue('s6', source.u_m6);
-					_setAoRecord(insertOrUpdate, gr_insert_target, source, 
+					this._setAoRecord(insertOrUpdate, gr_insert_target, source, 
 						source_table_name);
 					gr_insert_target.insert();
 					//释放内存
@@ -279,13 +289,13 @@ CollectPsiChange.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-08 08:36:24</sys_created_on>
         <sys_id>7bbd1c2993428610868ab4de3bba1078</sys_id>
-        <sys_mod_count>18</sys_mod_count>
+        <sys_mod_count>21</sys_mod_count>
         <sys_name>CollectPsiChange</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_script_include_7bbd1c2993428610868ab4de3bba1078</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-05-10 02:02:18</sys_updated_on>
+        <sys_updated_on>2024-08-01 06:57:47</sys_updated_on>
     </sys_script_include>
 </record_update>
