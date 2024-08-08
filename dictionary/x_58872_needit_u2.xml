@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="2c5028f683738a1043b695d6feaad313" extends="sys_import_set_row" label="U2" max_length="40" name="x_58872_needit_u2" type="collection">
+        <element label="Test18" max_length="40" name="test18" type="string"/>
+        <element label="Test13" max_length="40" name="test13" type="string"/>
+        <element label="Test21" max_length="40" name="test21" type="string"/>
+        <element label="Test46" max_length="40" name="test46" type="string"/>
+        <element label="Test8" max_length="40" name="test8" type="string"/>
+        <element label="Test41" max_length="40" name="test41" type="string"/>
+        <element label="Test14" max_length="40" name="test14" type="string"/>
+        <element label="Test6" max_length="40" name="test6" type="string"/>
+        <element label="Row Id" max_length="40" name="row_id" type="integer"/>
+        <element label="Test60" max_length="40" name="test60" type="string"/>
+        <element label="Test59" max_length="40" name="test59" type="string"/>
+        <element label="Test33" max_length="40" name="test33" type="string"/>
+        <element label="Test38" max_length="40" name="test38" type="string"/>
+        <element label="Test30" max_length="40" name="test30" type="string"/>
+        <element label="Test5" max_length="40" name="test5" type="string"/>
+        <element label="Test7" max_length="40" name="test7" type="string"/>
+        <element label="Test58" max_length="40" name="test58" type="string"/>
+        <element label="Test25" max_length="40" name="test25" type="string"/>
+        <element label="Test47" max_length="40" name="test47" type="string"/>
+        <element label="Test45" max_length="40" name="test45" type="string"/>
+        <element label="Test10" max_length="40" name="test10" type="string"/>
+        <element label="Test53" max_length="40" name="test53" type="string"/>
+        <element label="Test20" max_length="40" name="test20" type="string"/>
+        <element label="Test44" max_length="40" name="test44" type="string"/>
+        <element label="Test19" max_length="40" name="test19" type="string"/>
+        <element label="Test22" max_length="40" name="test22" type="string"/>
+        <element label="Test36" max_length="40" name="test36" type="string"/>
+        <element label="Test42" max_length="40" name="test42" type="string"/>
+        <element label="Test52" max_length="40" name="test52" type="string"/>
+        <element label="Test32" max_length="40" name="test32" type="string"/>
+        <element label="Test31" max_length="40" name="test31" type="string"/>
+        <element label="Test55" max_length="40" name="test55" type="string"/>
+        <element label="Test27" max_length="40" name="test27" type="string"/>
+        <element label="Test51" max_length="40" name="test51" type="string"/>
+        <element label="Test56" max_length="40" name="test56" type="string"/>
+        <element label="Test11" max_length="40" name="test11" type="string"/>
+        <element label="Test34" max_length="40" name="test34" type="string"/>
+        <element label="Test12" max_length="40" name="test12" type="string"/>
+        <element label="Test29" max_length="40" name="test29" type="string"/>
+        <element label="Test28" max_length="40" name="test28" type="string"/>
+        <element label="Test4" max_length="40" name="test4" type="string"/>
+        <element label="Test50" max_length="40" name="test50" type="string"/>
+        <element label="Test37" max_length="40" name="test37" type="string"/>
+        <element label="Test16" max_length="40" name="test16" type="string"/>
+        <element label="Test1" max_length="40" name="test1" type="string"/>
+        <element label="Test23" max_length="40" name="test23" type="string"/>
+        <element label="Test17" max_length="40" name="test17" type="string"/>
+        <element label="Test24" max_length="40" name="test24" type="string"/>
+        <element label="Test35" max_length="40" name="test35" type="string"/>
+        <element label="Test54" max_length="40" name="test54" type="string"/>
+        <element label="Test43" max_length="40" name="test43" type="string"/>
+        <element label="Test2" max_length="40" name="test2" type="string"/>
+        <element label="Test49" max_length="40" name="test49" type="string"/>
+        <element label="Test39" max_length="40" name="test39" type="string"/>
+        <element label="Test15" max_length="40" name="test15" type="string"/>
+        <element label="Test57" max_length="40" name="test57" type="string"/>
+        <element label="Test9" max_length="40" name="test9" type="string"/>
+        <element label="Test40" max_length="40" name="test40" type="string"/>
+        <element label="Test26" max_length="40" name="test26" type="string"/>
+        <element label="Test3" max_length="40" name="test3" type="string"/>
+        <element label="Test48" max_length="40" name="test48" type="string"/>
+        <index name="index">
+            <element name="row_id"/>
+        </index>
+    </element>
+</database>

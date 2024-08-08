@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_rte_eb_etl_entity">
+    <sys_rte_eb_etl_entity action="INSERT_OR_UPDATE">
+        <child_id_field/>
+        <name>IHUB_TARGET_TEMP_x_58872_needit_u2</name>
+        <parent_entity/>
+        <parent_id_field/>
+        <path>Temp_x_58872_needit_u2</path>
+        <run_business_rules>false</run_business_rules>
+        <synchronize_inserts>false</synchronize_inserts>
+        <sys_class_name>sys_rte_eb_etl_entity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-07 06:01:38</sys_created_on>
+        <sys_id>2983a83e83738a1043b695d6feaad3d8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>IHUB_TARGET_TEMP_x_58872_needit_u2</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_rte_eb_definition display_value="U2 Data Mapping_etl_ihub">a9a0203a83738a1043b695d6feaad337</sys_rte_eb_definition>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_rte_eb_etl_entity_2983a83e83738a1043b695d6feaad3d8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-07 06:01:38</sys_updated_on>
+        <table/>
+    </sys_rte_eb_etl_entity>
+</record_update>

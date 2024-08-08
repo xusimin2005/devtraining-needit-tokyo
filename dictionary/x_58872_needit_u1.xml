@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="b1f21f9a83f30a1043b695d6feaad334" extends="task" label="U1" max_length="40" name="x_58872_needit_u1" type="collection">
+        <element label="Test4" max_length="40" name="u_test4" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Test1" max_length="40" name="u_test1" type="string"/>
+        <element label="Test11" max_length="40" name="u_test11" type="string"/>
+        <element label="Test6" max_length="40" name="u_test6" type="string"/>
+        <element label="Test12" max_length="40" name="u_test12" type="string"/>
+        <element label="Test5" max_length="40" name="u_test5" type="string"/>
+        <element label="Test9" max_length="40" name="u_test9" type="string"/>
+        <element label="Test2" max_length="40" name="u_test2" type="string"/>
+        <element label="Test8" max_length="40" name="u_test8" type="string"/>
+        <element label="Test10" max_length="40" name="u_test10" type="string"/>
+        <element label="Test7" max_length="40" name="u_test7" type="string"/>
+        <element label="Test3" max_length="40" name="u_test3" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Row Id" max_length="40" name="u_row_id" type="integer"/>
+    </element>
+</database>

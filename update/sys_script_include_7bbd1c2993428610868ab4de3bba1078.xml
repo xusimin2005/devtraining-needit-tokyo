@@ -7,14 +7,17 @@
         <client_callable>false</client_callable>
         <description/>
         <name>CollectPsiChange</name>
-        <script><![CDATA[var CollectPsiChange = Class.create();
+        <script><![CDATA[/**
+ * 收集情报
+ * @type {CollectPsiChange}
+ */
+var CollectPsiChange = Class.create();
 CollectPsiChange.prototype = {
     initialize: function() {
     },
 
 	/**
 	 * 保存记录
-	 * 
 	 * @param {String} insertOrUpdate 新规或更新
 	 * @param {GliderRecord} target 目的表
 	 * @param {GliderRecord} source 元表
@@ -61,10 +64,8 @@ CollectPsiChange.prototype = {
 		}
 	},
 
-	/**
-	 * 
-	 */
 	collect: function(type) {
+		var _this = this;
 		var my_job = 'Auto Fetch Change: ';
 		var now = new GlideDateTime();
 		var def_fetch_time = new GlideDateTime('1970-01-01 00:00:00');
@@ -122,7 +123,7 @@ CollectPsiChange.prototype = {
 					//gr_update_target.setValue('s4', source.u_m4);
 					//gr_update_target.setValue('s5', source.u_m5);
 					//gr_update_target.setValue('s6', source.u_m6);
-					this._setAoRecord(insertOrUpdate, gr_update_target, source, source_table_name);
+					_this._setAoRecord(insertOrUpdate, gr_update_target, source, source_table_name);
 					gr_update_target.update();
 				} else {
 					var gr_insert_target = new GlideRecord(target_table_name);
@@ -134,7 +135,7 @@ CollectPsiChange.prototype = {
 					//gr_insert_target.setValue('s4', source.u_m4);
 					//gr_insert_target.setValue('s5', source.u_m5);
 					//gr_insert_target.setValue('s6', source.u_m6);
-					this._setAoRecord(insertOrUpdate, gr_insert_target, source, 
+					_this._setAoRecord(insertOrUpdate, gr_insert_target, source, 
 						source_table_name);
 					gr_insert_target.insert();
 					//释放内存
@@ -289,13 +290,13 @@ CollectPsiChange.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-08 08:36:24</sys_created_on>
         <sys_id>7bbd1c2993428610868ab4de3bba1078</sys_id>
-        <sys_mod_count>21</sys_mod_count>
+        <sys_mod_count>24</sys_mod_count>
         <sys_name>CollectPsiChange</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_script_include_7bbd1c2993428610868ab4de3bba1078</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-08-01 06:57:47</sys_updated_on>
+        <sys_updated_on>2024-08-03 04:54:19</sys_updated_on>
     </sys_script_include>
 </record_update>

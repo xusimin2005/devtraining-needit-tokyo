@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sn_ihub_data_mapping_definition">
+    <sn_ihub_data_mapping_definition action="INSERT_OR_UPDATE">
+        <integration_table>sys_data_source</integration_table>
+        <published_source_structure display_value="ih_import_FD3da0203a52738a108ae99f1a4b18c74d">fda0203a83738a1043b695d6feaad34d</published_source_structure>
+        <record_id>d5a0ecb683738a1043b695d6feaad3e3</record_id>
+        <source_structure display_value="ih_import_FD3da0203a52738a108ae99f1a4b18c74d">fda0203a83738a1043b695d6feaad34d</source_structure>
+        <sys_class_name>sn_ihub_data_mapping_definition</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-08-07 05:49:06</sys_created_on>
+        <sys_id>f5a0203a83738a1043b695d6feaad34f</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name/>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sn_ihub_data_mapping_definition_f5a0203a83738a1043b695d6feaad34f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-08-07 05:49:13</sys_updated_on>
+    </sn_ihub_data_mapping_definition>
+</record_update>

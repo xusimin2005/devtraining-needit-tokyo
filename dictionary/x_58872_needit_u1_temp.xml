@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="d99cbe5e83730a1043b695d6feaad3a3" extends="sys_import_set_row" label="U1 Temp" max_length="40" name="x_58872_needit_u1_temp" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test4" label="Test4" max_length="40" name="u_test4" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test6" label="Test6" max_length="40" name="u_test6" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test2" label="Test2" max_length="40" name="u_test2" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test3" label="Test3" max_length="40" name="u_test3" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test8" label="Test8" max_length="40" name="u_test8" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test11" label="Test11" max_length="40" name="u_test11" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test10" label="Test10" max_length="40" name="u_test10" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test1" label="Test1" max_length="40" name="u_test1" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test5" label="Test5" max_length="40" name="u_test5" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test12" label="Test12" max_length="40" name="u_test12" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test7" label="Test7" max_length="40" name="u_test7" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=Test9" label="Test9" max_length="40" name="u_test9" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Row Id" max_length="40" name="u_row_id" type="integer"/>
+    </element>
+</database>
