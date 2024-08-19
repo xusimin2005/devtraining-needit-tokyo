@@ -3,9 +3,9 @@
         <active>true</active>
         <collect>2</collect>
         <collect_indicator>true</collect_indicator>
-        <display>temporary job for collecting NeedIt Request type - NeedIt: Active Weekly</display>
+        <display> - NeedIt: Active Weekly</display>
         <indicator display_value="NeedIt: Active Weekly">c5d8f5be9774ca10ed8db857f053aff4</indicator>
-        <job display_value="temporary job for collecting NeedIt Request type">2ef2423e97b4ca10ed8db857f053afb3</job>
+        <job display_value="">2ef2423e97b4ca10ed8db857f053afb3</job>
         <sys_class_name>pa_job_indicators</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-03-11 09:50:19</sys_created_on>

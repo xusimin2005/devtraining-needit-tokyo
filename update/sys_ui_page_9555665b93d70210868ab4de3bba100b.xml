@@ -67,8 +67,10 @@ $j('#uploadFile').change(function() {
 			//parseNormalCsv(fileObj, "upd2");
 			csvUtility.parseNormalCsv(fileObj, true)
 				.then(function(datas) {
-					gel('upd2').value = JSON.stringify(datas);
+					var buff = JSON.stringify(datas);
+					gel('upd2').value = buff;
 					alert("get " + datas.details.length + " data lines");
+					// alert(buff);
 				}).catch(function(message) {
 					alert(message);
 					gel('upd2').value = "";
@@ -81,8 +83,10 @@ $j('#uploadFile').change(function() {
 			var params = ["string", "string", "string", "string", "number", "number", "number", "number"];
 			excelUtility.parseNormalExcel(fileObj, params, true)
 				.then(function(datas) {
-					gel('upd2').value = JSON.stringify(datas);
-					alert("get " + datas.details.length + " data lines");
+					var buff = JSON.stringify(datas);
+					gel('upd2').value = buff;
+					// alert("get " + datas.details.length + " data lines");
+					alert(buff);
 				}).catch(function(message) {
 					alert(message);
 					gel('upd2').value = "";
@@ -337,61 +341,50 @@ gs.info('MyDebug -INFO- The attachment sys_id ->' + attachmentId);
 // importSetRec.update();
 
 var datas = JSON.parse(upd2);
-var cnt = datas.details.length, limit_loop_cnt = 10000;
-var group = Math.ceil(cnt / limit_loop_cnt);
-var mod = cnt % limit_loop_cnt;
-var i = 0, j = 0, current_loop_cnt = 0;
-gs.info('MyDebug -INFO- datas.details.length ->' + cnt + ', group ->' + group + ', mod ->' + mod);
+var cnt = datas.details.length;
+var i = 0, j = 0;
+gs.info('MyDebug -INFO- datas.details.length ->' + cnt);
 
-for (i = 0; i < group; i++) {
-	if (i == group - 1) {
-		current_loop_cnt = mod;
-		if (current_loop_cnt == 0) current_loop_cnt = limit_loop_cnt;
-	} else {
-		current_loop_cnt = limit_loop_cnt;
+//Create Import Set
+var impSet = new GlideRecordSecure('sys_import_set');
+//impSet.mode = "asynchronous";
+impSet.state = "loaded";
+impSet.table_name = uploadTableName;
+impSet.short_description = "Type: File\nFormat: " + uploadFileType;
+impSet.data_source = dsr; //data source
+impSet.load_completed = new GlideDateTime().getDisplayValue();
+impSet.load_run_time = new GlideDuration(0);
+var impSet_id = impSet.insert();
+gs.info('MyDebug -INFO- impSet_id ->' + impSet_id);
+
+//获取明细数据
+var lineBuff = "";
+var importData = new GlideRecordSecure(uploadTableName);
+for (j = 0; j < cnt; j++) {
+	var item = datas.details[j];
+	//gs.info('MyDebug -INFO- item.u_company [' + item.u_company + ']');
+	importData.initialize();
+	lineBuff = "";
+	importData.sys_import_set = impSet_id; //Sys_id of the newly created import set
+	for (i = 0; i < datas.heads.length; i++) {
+		var colItem = datas.heads[i];
+		var itemValue = item[colItem];
+		importData.setValue(colItem, itemValue);
+		// if (i > 0) lineBuff += ", ";
+		// lineBuff += colItem + " = [" + itemValue + "]";
 	}
-
-	//Create Import Set
-	var impSet = new GlideRecordSecure('sys_import_set');
-	//impSet.mode = "asynchronous";
-	impSet.state = "loaded";
-	impSet.table_name = uploadTableName;
-	impSet.short_description = "Type: File\nFormat: " + uploadFileType;
-	impSet.data_source = dsr; //data source
-	impSet.load_completed = new GlideDateTime().getDisplayValue();
-	impSet.load_run_time = new GlideDuration(0);
-	var impSet_id = impSet.insert();
-	gs.info('MyDebug -INFO- impSet_id ->' + impSet_id);
-
-	//获取明细数据
-	var lineBuff = "";
-	var importData = new GlideRecordSecure(uploadTableName);
-	for (j = 0; j < current_loop_cnt; j++) {
-		var item = datas.details[limit_loop_cnt * i + j];
-		//gs.info('MyDebug -INFO- item.u_company [' + item.u_company + ']');
-		importData.initialize();
-		lineBuff = "";
-		importData.sys_import_set = impSet_id; //Sys_id of the newly created import set
-		for (var i = 0; i < datas.heads.length; i++) {
-			var colItem = datas.heads[i];
-			var itemValue = item[colItem];
-			importData.setValue(colItem, itemValue);
-			// if (i > 0) lineBuff += ", ";
-			// lineBuff += colItem + " = [" + itemValue + "]";
-		}
-		importData.insert();
-		// gs.info('MyDebug -INFO- item ->' +  lineBuff);
-	}
-
-	// //Finished loading the import set
-	// var updImpSet = new GlideRecordSecure('sys_import_set');
-	// updImpSet.get(impSet_id);
-	// updImpSet.state = "loaded";
-	// updImpSet.load_completed = new GlideDateTime().getDisplayValue();
-	// updImpSet.update();
-	// gs.info('MyDebug -INFO- impSet loaded');
-
+	importData.insert();
+	// gs.info('MyDebug -INFO- item ->' +  lineBuff);
 }
+gs.info('MyDebug -INFO- importData done');
+
+// //Finished loading the import set
+// var updImpSet = new GlideRecordSecure('sys_import_set');
+// updImpSet.get(impSet_id);
+// updImpSet.state = "loaded";
+// updImpSet.load_completed = new GlideDateTime().getDisplayValue();
+// updImpSet.update();
+// gs.info('MyDebug -INFO- impSet loaded');
 
 
 //var urlOnStack = GlideSession.get().getStack().bottom();
@@ -413,13 +406,13 @@ response.sendRedirect(encodeURI("sys_import_set_list.do"));
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-07-15 08:15:22</sys_created_on>
         <sys_id>9555665b93d70210868ab4de3bba100b</sys_id>
-        <sys_mod_count>10</sys_mod_count>
+        <sys_mod_count>13</sys_mod_count>
         <sys_name>sample_page2</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_9555665b93d70210868ab4de3bba100b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-08-06 09:11:03</sys_updated_on>
+        <sys_updated_on>2024-08-09 09:39:05</sys_updated_on>
     </sys_ui_page>
 </record_update>

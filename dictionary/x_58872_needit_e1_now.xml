@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="ad32c47393d38210868ab4de3bba10b9" label="E1 Now" max_length="40" name="x_58872_needit_e1_now" type="collection">
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M2" max_length="32" name="u_m2" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M10" max_length="32" name="u_m10" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M8" max_length="32" name="u_m8" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M4" max_length="32" name="u_m4" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Item" max_length="80" name="u_item" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M11" max_length="32" name="u_m11" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M7" max_length="32" name="u_m7" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M12" max_length="32" name="u_m12" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Company" max_length="40" name="u_company" type="string"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M1" max_length="32" name="u_m1" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M5" max_length="32" name="u_m5" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M9" max_length="32" name="u_m9" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M3" max_length="32" name="u_m3" reference="x_58872_needit_d1" type="reference"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="Year" max_length="40" name="u_year" type="integer"/>
+        <element calculation="(function calculatedFieldValue(current) {&#13;&#10;&#13;&#10;&#9;// Add your code here&#13;&#10;&#9;return '';  // return the calculated value&#13;&#10;&#13;&#10;})(current);" label="M6" max_length="32" name="u_m6" reference="x_58872_needit_d1" type="reference"/>
+        <index name="index">
+            <element name="u_m1"/>
+        </index>
+        <index name="index2">
+            <element name="u_m10"/>
+        </index>
+        <index name="index3">
+            <element name="u_m11"/>
+        </index>
+        <index name="index4">
+            <element name="u_m12"/>
+        </index>
+        <index name="index5">
+            <element name="u_m2"/>
+        </index>
+        <index name="index6">
+            <element name="u_m3"/>
+        </index>
+        <index name="index7">
+            <element name="u_m4"/>
+        </index>
+        <index name="index8">
+            <element name="u_m5"/>
+        </index>
+        <index name="index9">
+            <element name="u_m6"/>
+        </index>
+        <index name="index10">
+            <element name="u_m7"/>
+        </index>
+        <index name="index11">
+            <element name="u_m8"/>
+        </index>
+        <index name="index12">
+            <element name="u_m9"/>
+        </index>
+    </element>
+</database>
