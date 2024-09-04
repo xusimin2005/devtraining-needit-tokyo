@@ -68,6 +68,7 @@
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test154" label="Test154" max_length="40" name="u_test154" type="string"/>
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test030" label="Test030" max_length="40" name="u_test030" type="string"/>
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test093" label="Test093" max_length="40" name="u_test093" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=u_created" label="Created" max_length="40" name="u_created" type="string"/>
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test137" label="Test137" max_length="40" name="u_test137" type="string"/>
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test144" label="Test144" max_length="40" name="u_test144" type="string"/>
         <element attributes="edge_encryption_enabled=true,import_attribute_name=Test136" label="Test136" max_length="40" name="u_test136" type="string"/>

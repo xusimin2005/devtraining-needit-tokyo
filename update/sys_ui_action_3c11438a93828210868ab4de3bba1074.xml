@@ -46,10 +46,11 @@ var gu = new GlideURL('x_58872_needit_sample_page.do');
 gu.addParam('sysparm_fullname', '老李');
 g_navigation.openPopup(gu.getURL(), '_blank');
 
-	var scriptName = "x_58872_needit.MyScript";
-	ScriptLoader.getScripts(scriptName + ".jsdbx", function() {
-		var m = x_58872_needit.MyScript;
-		m.sayHello();
+	var script1Name = "x_58872_needit.MyScript.jsdbx";
+	var script2Name = "x_58872_needit.Utility.jsdbx";
+	ScriptLoader.getScripts([script1Name, script2Name], function() {
+		var m1 = x_58872_needit.MyScript;
+		m1.sayHello();
 	});
 
 // var gdw = new GlideModal("x_58872_needit_sample_page");
@@ -75,7 +76,7 @@ g_navigation.openPopup(gu.getURL(), '_blank');
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>3c11438a93828210868ab4de3bba1074</sys_id>
-        <sys_mod_count>49</sys_mod_count>
+        <sys_mod_count>53</sys_mod_count>
         <sys_name>Export Excel</sys_name>
         <sys_overrides/>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
@@ -83,7 +84,7 @@ g_navigation.openPopup(gu.getURL(), '_blank');
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_action_3c11438a93828210868ab4de3bba1074</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-08-05 03:25:37</sys_updated_on>
+        <sys_updated_on>2024-08-28 10:05:30</sys_updated_on>
         <table>x_58872_needit_u0</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>true</ui16_compatible>

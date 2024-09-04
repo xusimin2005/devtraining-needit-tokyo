@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="bc01a02d83589e1043b695d6feaad301" label="VU0" max_length="40" name="x_58872_needit_vu0" type="collection">
+        <element label="Item" max_length="40" name="item" type="string"/>
+        <element label="Company" max_length="40" name="company" type="string"/>
+        <element label="Ver" max_length="40" name="ver" type="string"/>
+        <element label="Year" max_length="40" name="year" type="integer"/>
+        <index name="index">
+            <element name="year"/>
+            <element name="company"/>
+            <element name="item"/>
+        </index>
+    </element>
+</database>
