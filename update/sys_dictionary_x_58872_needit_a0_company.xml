@@ -33,7 +33,7 @@
         <function_definition/>
         <function_field>false</function_field>
         <internal_type display_value="String">string</internal_type>
-        <mandatory>true</mandatory>
+        <mandatory>false</mandatory>
         <max_length>300</max_length>
         <name>x_58872_needit_a0</name>
         <next_element/>
@@ -58,7 +58,7 @@
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_dictionary_x_58872_needit_a0_company</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-07-02 06:33:53</sys_updated_on>
+        <sys_updated_on>2025-01-16 05:37:33</sys_updated_on>
         <table_reference>false</table_reference>
         <text_index>false</text_index>
         <unique>false</unique>
