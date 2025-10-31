@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[// 绑定按钮事件
+$j("#export").bind('click', function() {
+	
+	$j("#alertMsg").html("所有处理已完成，即将跳转画面...");
+
+	// 3秒后清除定时器
+	setTimeout(() => {
+		GlideModal.get().destroy(); // 关闭对话框
+		var url = new GlideURL('x_58872_needit_d1_list.do');
+		g_navigation.open(url.getURL());
+	}, 3000);
+});]]></client_script>
+        <description/>
+        <direct>false</direct>
+        <endpoint>x_58872_needit_sample_page3.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<g:evaluate>
+	var alertMsg = 'Waiting for Export...';
+</g:evaluate><html>
+<body>
+<button id="export">Export</button>
+<div id="alertMsg">${alertMsg}</div>
+</body>
+</html>
+</j:jelly>]]></html>
+        <name>sample_page3</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-30 09:23:27</sys_created_on>
+        <sys_id>0261259b93343210f0af3d5efaba1037</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>sample_page3</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sys_ui_page_0261259b93343210f0af3d5efaba1037</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-30 09:46:30</sys_updated_on>
+    </sys_ui_page>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>0261259b93343210f0af3d5efaba1037</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-10-30 09:23:26</sys_created_on>
+        <sys_id>578365db93343210f0af3d5efaba103d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-10-30 09:23:26</sys_updated_on>
+        <table>sys_ui_page</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

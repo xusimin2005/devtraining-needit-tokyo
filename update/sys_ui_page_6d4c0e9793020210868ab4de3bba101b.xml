@@ -46,6 +46,8 @@ setTimeout(function(){
 }, 5000); //单位是毫秒
 */
 
+var blobs = [];
+
 var clients = [
 	{ "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
 	{ "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
@@ -1260,13 +1262,13 @@ $j('#change_data').click(function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2024-05-14 03:12:55</sys_created_on>
         <sys_id>6d4c0e9793020210868ab4de3bba101b</sys_id>
-        <sys_mod_count>1182</sys_mod_count>
+        <sys_mod_count>1185</sys_mod_count>
         <sys_name>sample_page</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_6d4c0e9793020210868ab4de3bba101b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2024-10-11 01:35:38</sys_updated_on>
+        <sys_updated_on>2025-10-23 10:03:20</sys_updated_on>
     </sys_ui_page>
 </record_update>
