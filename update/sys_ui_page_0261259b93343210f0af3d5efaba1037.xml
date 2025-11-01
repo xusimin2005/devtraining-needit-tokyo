@@ -4,15 +4,21 @@
         <client_script><![CDATA[// 绑定按钮事件
 $j("#export").bind('click', function() {
 	
-	alert('hello');
-	// $j("#alertMsg").html("所有处理已完成，即将跳转画面...");
+	// alert('hello');
+	$j("#cancel").attr("disabled", "disabled");
+	$j("#alertMsg").html("所有处理已完成，即将跳转画面...");
 
-	// // 3秒后清除定时器
-	// setTimeout(() => {
-	// 	GlideModal.get().destroy(); // 关闭对话框
-	// 	var url = new GlideURL('x_58872_needit_d1_list.do');
-	// 	g_navigation.open(url.getURL());
-	// }, 3000);
+	// 3秒后清除定时器
+	setTimeout(() => {
+		GlideModal.get().destroy(); // 关闭对话框
+		var url = new GlideURL('x_58872_needit_d1_list.do');
+		g_navigation.open(url.getURL());
+	}, 5000);
+});
+
+$j("#cancel").bind('click', function() {
+	
+	GlideModal.get().destroy(); // 关闭对话框
 });]]></client_script>
         <description/>
         <direct>false</direct>
@@ -21,10 +27,50 @@ $j("#export").bind('click', function() {
 <j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
 <g:evaluate>
 	var alertMsg = 'Waiting for Export...';
-</g:evaluate><html>
+</g:evaluate>
+<html>
+<head>
+	<!-- 自定义样式 -->
+	<style type="text/css">
+		select {
+			/* margin-bottom: 10px;
+			margin-top: 10px; */
+			font-family: cursive, sans-serif;
+			outline: 0;
+			/* background: #2ecc71;
+			color: #fff;
+			border: 1px solid crimson; */
+			padding: 4px;
+			border-radius: 9px;
+		}
+		
+		.bottom_area table {
+			float: right;
+		}
+
+		.bottom_area th, td {
+			padding: 10px 0px 5px 10px;
+			border-top-width: 0;
+			border-left-width: 0;
+		}
+
+		.bottom_area button:hover {
+			background-color: yellow;
+		}
+	</style>
+</head>
 <body>
-<button id="export">Export</button>
-<div id="alertMsg">${alertMsg}</div>
+	<div id="alertMsg">${alertMsg}</div>
+	<div class="bottom_area">
+		<table>
+			<tbody>
+				<tr>
+					<td><button id="export">Export</button></td>
+					<td><button id="cancel">Close</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>
 </j:jelly>]]></html>
@@ -34,14 +80,14 @@ $j("#export").bind('click', function() {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2025-10-30 09:23:27</sys_created_on>
         <sys_id>0261259b93343210f0af3d5efaba1037</sys_id>
-        <sys_mod_count>6</sys_mod_count>
+        <sys_mod_count>13</sys_mod_count>
         <sys_name>sample_page3</sys_name>
         <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
         <sys_policy/>
         <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
         <sys_update_name>sys_ui_page_0261259b93343210f0af3d5efaba1037</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-10-31 10:11:53</sys_updated_on>
+        <sys_updated_on>2025-11-01 19:46:52</sys_updated_on>
     </sys_ui_page>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>0261259b93343210f0af3d5efaba1037</id>
